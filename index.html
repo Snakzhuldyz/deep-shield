@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#dff1ff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Deep Shield">
+<title>DEEP SHIELD KZ</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* Layout: mobile-first "lab console" — one column of panels, bottom tab bar, hash-routed views. Single dark theme by choice. */
+:root{
+  --bg:#070d1c; --panel:#0f1830; --panel2:#152142; --line:#24345e;
+  --ink:#eaf1ff; --muted:#93a3c7; --accent:#2ee6d6;
+  --stop:#ff4d5e; --check:#ffb020; --compare:#3d8bff; --protect:#25d07a; --report:#b06bff;
+  --display:"Unbounded","Montserrat",system-ui,sans-serif;
+  --body:"Montserrat",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5}
+body{padding-bottom:84px;background-image:radial-gradient(circle at 20% -10%,rgba(46,230,214,.12),transparent 40%),linear-gradient(rgba(61,139,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(61,139,255,.04) 1px,transparent 1px);background-size:auto,28px 28px,28px 28px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.2}
+h1{font-size:clamp(28px,7vw,44px);letter-spacing:.5px}
+h2{font-size:clamp(20px,5vw,26px)}
+h3{font-size:17px}
+p{margin:0}
+button{font-family:inherit;font-size:15px;cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.wrap{max-width:760px;margin:0 auto;padding:18px 16px;display:flex;flex-direction:column;gap:18px}
+.view{display:none}
+.view.on{display:block}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.eyebrow{font-family:var(--display);font-size:11px;letter-spacing:2px;color:var(--accent);text-transform:uppercase}
+.btn{background:var(--accent);color:#04201d;border:0;border-radius:12px;padding:12px 16px;font-weight:700}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn:disabled{opacity:.4;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media (max-width:420px){.grid2{grid-template-columns:1fr}}
+
+/* hero */
+.hero{display:flex;gap:16px;align-items:center}
+.shield{width:84px;flex:none}
+.tag{font-family:var(--display);font-size:13px;color:var(--muted)}
+.motto{font-weight:700;color:var(--accent)}
+
+/* steps */
+.steps{display:flex;flex-direction:column;gap:10px}
+.step{display:grid;grid-template-columns:56px 1fr auto;gap:12px;align-items:center;background:var(--panel2);border:1px solid var(--line);border-left:6px solid var(--c);border-radius:14px;padding:12px 14px;text-align:left;color:var(--ink);width:100%}
+.step .n{font-family:var(--display);font-size:22px;color:var(--c);text-align:center}
+.step b{font-family:var(--display);font-size:16px;letter-spacing:1px;color:var(--c);display:block}
+.step .st{width:26px;height:26px;border-radius:50%;border:2px solid var(--c);display:grid;place-items:center;font-size:14px;color:var(--bg)}
+.step.done .st{background:var(--c)}
+.detail{border-left:4px solid var(--c);padding-left:14px;display:flex;flex-direction:column;gap:8px}
+.detail ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+
+/* tiles */
+.tile{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:14px;text-align:left;color:var(--ink);display:flex;flex-direction:column;gap:6px}
+.tile .ic{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:rgba(46,230,214,.12);color:var(--accent);font-family:var(--display);font-weight:800}
+.tile b{font-size:15px}
+
+/* progress */
+.badges{display:flex;gap:8px;flex-wrap:wrap}
+.badge{font-family:var(--display);font-size:10px;letter-spacing:1px;padding:6px 10px;border-radius:999px;border:1px solid var(--c);color:var(--c);opacity:.45}
+.badge.got{opacity:1;background:color-mix(in srgb,var(--c) 18%,transparent)}
+.bar{height:8px;background:var(--panel2);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .4s}
+
+/* game cards */
+.card{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.msg{background:#0a1226;border:1px dashed var(--line);border-radius:12px;padding:12px;font-size:15px}
+.msg .from{font-size:12px;color:var(--muted);margin-bottom:4px}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:12px;padding:12px;text-align:left}
+.opt.ok{border-color:var(--protect);background:rgba(37,208,122,.15)}
+.opt.bad{border-color:var(--stop);background:rgba(255,77,94,.15)}
+.explain{border-radius:12px;padding:12px;background:rgba(46,230,214,.08);border:1px solid rgba(46,230,214,.3);font-size:14px}
+.counter{font-family:var(--display);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* spot game */
+.spotbox{position:relative;max-width:420px;margin:0 auto;width:100%}
+.spotbox svg{width:100%;height:auto;display:block;border-radius:14px;border:1px solid var(--line)}
+.hit{fill:transparent;cursor:pointer}
+.ring{fill:none;stroke:var(--check);stroke-width:4;stroke-dasharray:6 4}
+.found{display:flex;flex-direction:column;gap:6px;margin:0;padding-left:18px;font-size:14px}
+
+/* scanner */
+.drop{border:2px dashed var(--line);border-radius:14px;padding:22px;text-align:center;display:flex;flex-direction:column;gap:8px;align-items:center}
+.scanimg{position:relative;max-width:360px;margin:0 auto;border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+.scanimg img{display:block;width:100%}
+.scanimg .beam{position:absolute;left:0;right:0;height:3px;background:var(--accent);box-shadow:0 0 18px var(--accent);top:0;animation:beam 1.6s linear infinite}
+.scanimg .corner{position:absolute;inset:10px;border:2px solid rgba(46,230,214,.5);border-radius:10px}
+@keyframes beam{from{top:0}to{top:100%}}
+@media (prefers-reduced-motion:reduce){.scanimg .beam{animation:none;display:none}.bar i{transition:none}}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:14px}
+.facts dt{color:var(--muted)}
+.facts dd{margin:0;font-variant-numeric:tabular-nums;word-break:break-word}
+.q{display:flex;flex-direction:column;gap:6px;padding:10px 0;border-top:1px solid var(--line)}
+.seg{display:flex;gap:6px}
+.seg button{flex:1;background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:8px 4px;font-size:13px}
+.seg button.sel{border-color:var(--accent);background:rgba(46,230,214,.15)}
+.meter{height:14px;border-radius:99px;background:linear-gradient(90deg,var(--protect),var(--check),var(--stop));position:relative}
+.meter i{position:absolute;top:-5px;width:6px;height:24px;border-radius:3px;background:var(--ink);transform:translateX(-3px);transition:left .4s}
+.verdict{font-family:var(--display);font-size:18px}
+
+/* rights */
+.law{background:var(--panel2);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.law summary{padding:14px;cursor:pointer;font-weight:700;list-style:none;display:flex;gap:10px;align-items:center}
+.law summary::-webkit-details-marker{display:none}
+.law summary span{font-family:var(--display);font-size:11px;color:var(--accent);border:1px solid var(--accent);border-radius:6px;padding:2px 6px;flex:none}
+.law .body{padding:0 14px 14px;display:flex;flex-direction:column;gap:8px;font-size:15px}
+.law ul{margin:0;padding-left:18px}
+.phones{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.phone{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center}
+.phone b{font-family:var(--display);font-size:26px;display:block;color:var(--accent)}
+
+/* quiz result */
+.cert{border:2px solid var(--accent);border-radius:16px;padding:20px;text-align:center;display:flex;flex-direction:column;gap:8px;background:linear-gradient(160deg,rgba(46,230,214,.12),rgba(176,107,255,.1))}
+.cert .score{font-family:var(--display);font-size:42px;color:var(--accent);font-variant-numeric:tabular-nums}
+input[type=text],input[type=url]{width:100%;background:#0a1226;border:1px solid var(--line);color:var(--ink);border-radius:12px;padding:12px;font-size:15px;font-family:inherit}
+#qrout{background:#fff;padding:16px;border-radius:14px;width:max-content;max-width:100%;margin:0 auto}
+#qrout img,#qrout canvas{display:block;width:260px;height:260px;max-width:100%}
+
+
+/* face id */
+.stage{position:relative;max-width:380px;margin:0 auto;width:100%;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#000;touch-action:manipulation}
+.stage img{display:block;width:100%}
+.stage svg{position:absolute;inset:0;width:100%;height:100%}
+.fstep{display:flex;gap:10px;align-items:center}
+.fstep .num{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-size:13px;background:var(--panel2);border:1px solid var(--line);flex:none}
+.fstep.on .num{background:var(--accent);color:#04201d;border-color:var(--accent)}
+.fstep.ok .num{background:var(--protect);color:#04201d;border-color:var(--protect)}
+.codegrid{display:grid;grid-template-columns:repeat(16,1fr);gap:1px;width:160px;border-radius:6px;overflow:hidden;border:1px solid var(--line)}
+.codegrid i{aspect-ratio:1;display:block}
+.lock{font-family:var(--display);font-size:20px;display:flex;align-items:center;gap:10px}
+input[type=range]{width:100%;accent-color:var(--accent)}
+
+
+/* app shell */
+.appbar{position:sticky;top:0;z-index:8;background:rgba(7,13,28,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:calc(10px + env(safe-area-inset-top)) 16px 10px;display:flex;align-items:center;gap:10px}
+.appbar b{font-family:var(--display);font-size:14px;letter-spacing:1px}
+.appbar .sp{flex:1}
+.appbar .pill{font-family:var(--display);font-size:11px;color:var(--accent);border:1px solid var(--accent);border-radius:99px;padding:3px 9px;font-variant-numeric:tabular-nums}
+#splash{position:fixed;inset:0;z-index:20;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .5s}
+#splash.hide{opacity:0;pointer-events:none}
+#splash svg{width:96px;animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.06);filter:drop-shadow(0 0 16px #2ee6d6)}}
+@media (prefers-reduced-motion:reduce){#splash svg{animation:none}#splash{transition:none}}
+nav.tabs{padding-bottom:calc(10px + env(safe-area-inset-bottom))}
+body{padding-bottom:calc(84px + env(safe-area-inset-bottom));padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+.install{display:flex;flex-direction:column;gap:8px}
+.install ol{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+
+/* tabbar */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:rgba(7,13,28,.96);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:6px 4px 10px;z-index:9}
+nav.tabs a{color:var(--muted);text-decoration:none;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 6px;border-radius:10px;min-width:58px}
+nav.tabs a svg{width:22px;height:22px}
+nav.tabs a.on{color:var(--accent)}
+.back{background:none;border:0;color:var(--muted);padding:0;text-align:left;font-size:14px}
+.back:hover{color:var(--ink)}
+
+/* ===== KIDS THEME (overrides) ===== */
+:root{
+  --bg:#e6f4ff; --panel:#ffffff; --panel2:#f2f8ff; --line:#cfe2f7;
+  --ink:#1c2a4d; --muted:#5a6b8f; --accent:#0a9fd8;
+  --stop:#e8384f; --check:#e08a00; --compare:#2f7df6; --protect:#16a356; --report:#9446f0;
+  --display:"Nunito",system-ui,sans-serif; --body:"Nunito",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color-scheme:light;
+}
+html,body{font-size:18px;background:var(--bg)}
+body{background-image:radial-gradient(circle at 10% 0%,#fff6c9 0,transparent 30%),radial-gradient(circle at 100% 30%,#ffe1ec 0,transparent 28%),radial-gradient(circle at 0% 80%,#dcffe9 0,transparent 30%);background-size:auto}
+h1,h2,h3{font-weight:900}
+h1{font-size:clamp(28px,8vw,40px);color:#1556b8}
+h2{font-size:clamp(24px,6vw,30px)}
+.eyebrow{font-weight:900;font-size:13px;letter-spacing:1px}
+.panel{border:2px solid var(--line);border-radius:24px;box-shadow:0 6px 0 #d3e5f8}
+.btn{background:var(--accent);color:#fff;border-radius:18px;padding:15px 18px;font-size:18px;font-weight:900;box-shadow:0 5px 0 #067aa7;transition:transform .08s}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #067aa7}
+.btn.ghost{background:#fff;color:var(--ink);border:2px solid var(--line);box-shadow:0 5px 0 #d3e5f8}
+.tile{border:2px solid var(--line);border-radius:22px;background:#fff;box-shadow:0 6px 0 #d3e5f8;padding:16px;transition:transform .08s}
+.tile:active{transform:translateY(4px);box-shadow:0 2px 0 #d3e5f8}
+.tile b{font-size:19px;font-weight:900}
+.tile .ic{width:48px;height:48px;border-radius:16px;font-size:26px;background:#fff3c4;color:var(--ink)}
+.step{background:#fff;border:2px solid var(--line);border-left:10px solid var(--c);border-radius:20px;box-shadow:0 5px 0 #d3e5f8;grid-template-columns:52px 1fr auto;padding:14px}
+.step .n{font-size:30px}
+.step b{font-size:19px;font-weight:900}
+.step .st{width:32px;height:32px}
+.step.done .st{color:#fff}
+.badge{font-size:12px;font-weight:900;padding:8px 12px;opacity:.35;background:#fff}
+.badge.got{opacity:1;color:#fff;background:var(--c)}
+.bar{height:14px;background:#fff;border:2px solid var(--line)}
+.bar i{background:linear-gradient(90deg,#ffcf3d,#16a356)}
+.card{background:#fff;border:2px solid var(--line);border-radius:24px;box-shadow:0 6px 0 #d3e5f8}
+.msg{background:#fffbe8;border:2px dashed #f2d27a;border-radius:18px;font-size:18px}
+.opt{background:#fff;border:2px solid var(--line);border-radius:18px;padding:15px;font-size:17px;font-weight:700;box-shadow:0 4px 0 #d3e5f8}
+.opt.ok{border-color:var(--protect);background:#dcf8e8;box-shadow:0 4px 0 #9fe0bb}
+.opt.bad{border-color:var(--stop);background:#ffe1e5;box-shadow:0 4px 0 #f3a9b3}
+.explain{background:#e5f6ff;border:2px solid #a9dcf5;border-radius:16px;font-size:16px}
+.cert{background:linear-gradient(160deg,#fff6c9,#e3f3ff);border:3px solid var(--accent);border-radius:26px}
+.cert .score{font-size:52px}
+input[type=text],input[type=url]{background:#fff;border:2px solid var(--line);border-radius:16px;font-size:17px}
+.law{background:#fff;border:2px solid var(--line);border-radius:20px}
+.phone{background:#fff;border:2px solid var(--line);border-radius:20px}
+.seg button{background:#fff;border:2px solid var(--line);font-size:15px;font-weight:700;padding:10px 4px}
+.seg button.sel{background:#d8f2ff}
+.drop{border:3px dashed #9fd3f2;border-radius:22px;background:#f7fcff}
+.appbar{background:rgba(255,255,255,.95);border-bottom:2px solid var(--line)}
+.appbar b{font-weight:900;color:#1556b8}
+.appbar .pill{font-weight:900;background:#fff3c4;border-color:#f2c94c;color:var(--ink)}
+nav.tabs{background:#fff;border-top:2px solid var(--line);box-shadow:0 -4px 14px rgba(29,79,168,.08)}
+nav.tabs a{font-size:12px;font-weight:800}
+nav.tabs a svg{width:26px;height:26px}
+nav.tabs a.on{color:#fff;background:var(--accent)}
+.back{font-size:16px;font-weight:800;color:var(--accent)}
+#splash{background:linear-gradient(180deg,#bfe6ff,#e6f4ff)}
+#splash svg{width:auto}
+.meter i{background:var(--ink)}
+.counter{font-size:14px;font-weight:900;background:#fff;border:2px solid var(--line);border-radius:99px;padding:4px 10px}
+a.tile,a.step{text-decoration:none;color:var(--ink)}
+
+#agePick{position:fixed;inset:0;z-index:15;background:linear-gradient(180deg,#bfe6ff,#e6f4ff);overflow:auto;padding:calc(20px + env(safe-area-inset-top)) 16px 30px}
+#agePick .agebox{max-width:440px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.agebtn{display:grid;grid-template-columns:56px 1fr;grid-template-rows:auto auto;column-gap:12px;align-items:center;text-align:left;background:#fff;border:3px solid var(--line);border-radius:24px;padding:14px 16px;box-shadow:0 6px 0 #c6dcf3;color:var(--ink);font-family:inherit}
+.agebtn span{grid-row:span 2;font-size:40px;text-align:center}
+.agebtn b{font-size:22px;font-weight:900}
+.agebtn small{font-size:15px;color:var(--muted);font-weight:700}
+.agebtn:active{transform:translateY(4px);box-shadow:0 2px 0 #c6dcf3}
+.agebtn.sel{border-color:var(--accent)}
+.kr{display:grid;grid-template-columns:44px 1fr;gap:10px;align-items:center}
+.kr span{font-size:32px;text-align:center}
+/* mascot */
+#buddy{position:fixed;right:10px;bottom:calc(86px + env(safe-area-inset-bottom));z-index:10;display:flex;align-items:flex-end;gap:6px;pointer-events:none}
+#buddy .say{pointer-events:auto;max-width:230px;background:#fff;border:2px solid var(--line);border-radius:18px 18px 4px 18px;padding:10px 12px;font-size:15px;font-weight:700;box-shadow:0 6px 18px rgba(29,79,168,.18);transition:opacity .25s,transform .25s;transform-origin:bottom right}
+#buddy .say.hide{opacity:0;transform:scale(.85);pointer-events:none}
+#buddy button{pointer-events:auto;background:none;border:0;padding:0;width:84px;height:100px}
+#buddy svg{width:100%;height:100%;overflow:visible}
+#buddy .bob{animation:bob 2.4s ease-in-out infinite;transform-origin:50% 100%}
+@keyframes bob{50%{transform:translateY(-4px)}}
+#buddy.jump .bob{animation:jump .5s ease}
+@keyframes jump{40%{transform:translateY(-16px) rotate(-6deg)}}
+#buddy .happy,#buddy .sad,#splash .happy,#splash .sad,#ageBuddy .happy,#ageBuddy .sad{display:none}
+#buddy.mood-happy .happy{display:inline}#buddy.mood-happy .norm{display:none}
+#buddy.mood-sad .sad{display:inline}#buddy.mood-sad .norm{display:none}
+@media (prefers-reduced-motion:reduce){#buddy .bob,#buddy.jump .bob{animation:none}}
+.wrap{padding-bottom:110px}
+</style>
+</head>
+<body>
+<div id="splash"><div style="width:130px;height:150px"><svg viewBox="0 0 120 140" aria-hidden="true"><g class="bob">
+<ellipse cx="60" cy="136" rx="30" ry="4" fill="rgba(29,79,168,.18)"/>
+<path d="M30 132 Q30 96 60 96 Q90 96 90 132Z" fill="#2f7df6"/>
+<path d="M60 100 l14 5v10c0 9-6 14-14 17-8-3-14-8-14-17v-10Z" fill="#ffd34d" stroke="#fff" stroke-width="2"/>
+<path d="M54 113l4 4 8-8" stroke="#1c2a4d" stroke-width="3" fill="none" stroke-linecap="round"/>
+<path d="M88 112 q14 -6 18 -22" stroke="#f3c29b" stroke-width="9" stroke-linecap="round" fill="none"/>
+<circle cx="107" cy="86" r="7" fill="#f3c29b"/>
+<circle cx="60" cy="62" r="34" fill="#f6cba6"/>
+<ellipse cx="26" cy="64" rx="6" ry="9" fill="#efb68e"/><ellipse cx="94" cy="64" rx="6" ry="9" fill="#efb68e"/>
+<path d="M28 50 Q30 26 60 26 Q90 26 92 50 Q78 40 60 40 Q42 40 28 50Z" fill="#3a2516"/>
+<path d="M27 44 Q28 12 60 12 Q92 12 93 44 Z" fill="#1b9e6e"/>
+<path d="M27 44 h66" stroke="#ffd34d" stroke-width="5"/>
+<path d="M40 30 q5 -8 10 0 q5 8 10 0 q5 -8 10 0 q5 8 10 0" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>
+<circle cx="60" cy="14" r="4" fill="#ffd34d"/>
+<g class="norm"><ellipse cx="47" cy="62" rx="5" ry="6.5" fill="#1c2a4d"/><ellipse cx="73" cy="62" rx="5" ry="6.5" fill="#1c2a4d"/><circle cx="49" cy="60" r="2" fill="#fff"/><circle cx="75" cy="60" r="2" fill="#fff"/><path d="M50 78 Q60 86 70 78" stroke="#a34a33" stroke-width="3.5" fill="none" stroke-linecap="round"/></g>
+<g class="happy"><path d="M41 63 q6 -8 12 0M67 63 q6 -8 12 0" stroke="#1c2a4d" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M48 76 Q60 92 72 76Z" fill="#a34a33"/></g>
+<g class="sad"><ellipse cx="47" cy="63" rx="4.5" ry="5.5" fill="#1c2a4d"/><ellipse cx="73" cy="63" rx="4.5" ry="5.5" fill="#1c2a4d"/><path d="M41 52 l10 3M79 52 l-10 3" stroke="#3a2516" stroke-width="3" stroke-linecap="round"/><path d="M52 82 Q60 76 68 82" stroke="#a34a33" stroke-width="3.5" fill="none" stroke-linecap="round"/></g>
+<circle cx="38" cy="74" r="5" fill="#ff9fb0" opacity=".6"/><circle cx="82" cy="74" r="5" fill="#ff9fb0" opacity=".6"/>
+</g></svg></div><b style="font-size:20px">Сәлем! Мен Сақболмын 👋</b><svg style="display:none" viewBox="0 0 100 116" aria-hidden="true"><path d="M50 4 92 18v38c0 28-18 46-42 56C26 102 8 84 8 56V18Z" fill="#1d5fc9" stroke="#2ee6d6" stroke-width="5"/><circle cx="50" cy="52" r="18" fill="none" stroke="#2ee6d6" stroke-width="4"/><circle cx="50" cy="52" r="6" fill="#2ee6d6"/></svg><b style="font-family:var(--display);font-size:22px">DEEP SHIELD KZ</b><span class="muted small">Цифрлық қауіпсіздік зертханасы</span></div>
+<header class="appbar"><a href="#home" style="display:flex;align-items:center;gap:8px;color:var(--ink);text-decoration:none"><span style="width:26px;display:block"><svg viewBox="0 0 100 116" aria-hidden="true"><path d="M50 4 92 18v38c0 28-18 46-42 56C26 102 8 84 8 56V18Z" fill="#1d5fc9" stroke="#2ee6d6" stroke-width="5"/><circle cx="50" cy="52" r="18" fill="none" stroke="#2ee6d6" stroke-width="4"/><circle cx="50" cy="52" r="6" fill="#2ee6d6"/></svg></span><b>DEEP SHIELD KZ</b></a><span class="sp"></span><button class="pill" id="ageBtn" style="background:#fff;border-color:var(--line);cursor:pointer" aria-label="Жасты өзгерту">👤</button><span class="pill" id="barProg">🛡 0/5</span></header>
+
+<!-- ============ HOME ============ -->
+<section class="view" id="v-home"><div class="wrap">
+  <div class="hero">
+    <svg class="shield" viewBox="0 0 100 116" aria-hidden="true">
+      <path d="M50 4 92 18v38c0 28-18 46-42 56C26 102 8 84 8 56V18Z" fill="#1d5fc9" stroke="#2ee6d6" stroke-width="4"/>
+      <circle cx="50" cy="52" r="18" fill="none" stroke="#2ee6d6" stroke-width="3"/>
+      <circle cx="50" cy="52" r="6" fill="#2ee6d6"/>
+      <path d="M26 52h-8M82 52h-8M50 28v-8M50 84v-8" stroke="#2ee6d6" stroke-width="3"/>
+    </svg>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <h1>DEEP SHIELD KZ</h1>
+      <p class="tag">Цифрлық қауіпсіздік зертханасы</p>
+      <p class="motto">Дипфэйкті таны. Құқығыңды біл. Өзіңді қорға.</p>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="row" style="justify-content:space-between;align-items:center">
+      <span class="eyebrow">Менің қалқаным</span>
+      <span class="counter" id="progTxt">0 / 5</span>
+    </div>
+    <div class="bar"><i id="progBar"></i></div>
+    <div class="badges" id="badges"></div>
+    <p class="small muted">Әр қадамның тапсырмасын орындасаң, қалқанның бір бөлігі жанады.</p>
+  </div>
+
+  <div class="panel">
+    <span class="eyebrow">Қорғаныстың 5 қадамы</span>
+    <div class="steps" id="homeSteps"></div>
+  </div>
+
+  <div class="grid2">
+    <a class="tile" href="#games"><span class="ic">▶</span><b>Ойын-сабақтар</b><span class="small muted">Шын ба, жалған ба? Дипфэйкті тап. Кімге айтам?</span></a>
+    <a class="tile" href="#scan"><span class="ic">◎</span><b>Бет-сканер және Face ID</b><span class="small muted">Фотодағы дипфэйк белгілері, камерамен бет тану</span></a>
+    <a class="tile" href="#test"><span class="ic">✓</span><b>Тест</b><span class="small muted">15 сұрақ және «Цифрлық қорғаушы» сертификаты</span></a>
+    <a class="tile" href="#rights"><span class="ic">§</span><b>Менің құқығым</b><span class="small muted">Заңдар, кибербуллинг, сенім телефондары</span></a>
+  </div>
+  <a class="tile" href="#install" style="text-decoration:none"><span class="ic">⇩</span><b>Телефонға орнату</b><span class="small muted">Басты экранға қосымша етіп қою</span></a>
+  <a class="tile" href="#qr" style="text-decoration:none"><span class="ic">▦</span><b>Мұғалімге: QR-код жасау</b><span class="small muted">Сілтемені QR етіп тақтаға шығару</span></a>
+</div></section>
+
+<!-- ============ STEPS ============ -->
+<section class="view" id="v-steps"><div class="wrap">
+  <button class="back" data-go="home">← Басты бет</button>
+  <h2>5 қадам: не істеймін?</h2>
+  <p class="muted">Кез келген күмәнді видео, фото, дауыстық хабар не жаңалық көрсең, осы ретпен әрекет ет.</p>
+  <div id="stepDetails" style="display:flex;flex-direction:column;gap:14px"></div>
+</div></section>
+
+<!-- ============ GAMES ============ -->
+<section class="view" id="v-games"><div class="wrap">
+  <h2>Ойын-сабақтар</h2>
+  <p class="muted">Әр ойын бір қадамды жаттықтырады. Сабақта топпен де ойнауға болады.</p>
+  <a class="tile" href="#game-fakereal" style="border-left:6px solid var(--stop)"><span class="eyebrow" style="color:var(--stop)">ТОҚТА · ТЕКСЕР</span><b>Шын ба, жалған ба?</b><span class="small muted">10 хабарлама мен жаңалық. Әрқайсысына дұрыс шешім таңда.</span></a>
+  <a class="tile" href="#game-spot" style="border-left:6px solid var(--compare)"><span class="eyebrow" style="color:var(--compare)">САЛЫСТЫР</span><b>Дипфэйкті тап</b><span class="small muted">ЖИ жасаған «фотодағы» 5 қатені тауып, басып көрсет.</span></a>
+  <a class="tile" href="#game-finance" style="border-left:6px solid var(--check)"><span class="eyebrow" style="color:var(--check)">ҚОРҒА · ҚАРЖЫ</span><b>Қаржылық қауіпсіздік</b><span class="small muted">«Банк қызметкері», тегін ұтыс, QR-алаяқтық: 8 жағдай. Ата-анаға кеңестер.</span></a>
+  <a class="tile" href="#game-report" style="border-left:6px solid var(--report)"><span class="eyebrow" style="color:var(--report)">ҚОРҒА · ХАБАРЛА</span><b>Кімге айтам?</b><span class="small muted">6 жағдай. Өзіңді қалай қорғап, кімге хабарлайсың?</span></a>
+</div></section>
+
+<!-- game: fake or real -->
+<section class="view" id="v-game-fakereal"><div class="wrap">
+  <button class="back" data-go="games">← Ойындар</button>
+  <div class="row" style="justify-content:space-between;align-items:center"><h2>Шын ба, жалған ба?</h2><span class="counter" id="frCount"></span></div>
+  <div id="frBox"></div>
+</div></section>
+
+<!-- game: spot -->
+<section class="view" id="v-game-spot"><div class="wrap">
+  <button class="back" data-go="games">← Ойындар</button>
+  <div class="row" style="justify-content:space-between;align-items:center"><h2>Дипфэйкті тап</h2><span class="counter" id="spotCount">0 / 5</span></div>
+  <p class="muted">Бұл суретті «жасанды интеллект жасады». Онда 5 қате бар. Күмәнді жерді бас.</p>
+  <div class="spotbox">
+    <svg id="spotSvg" viewBox="0 0 360 440" role="img" aria-label="ЖИ жасаған сурет: саябақта тұрған оқушы">
+      <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7cc4ff"/><stop offset="1" stop-color="#d9f0ff"/></linearGradient></defs>
+      <rect width="360" height="440" fill="url(#sky)"/>
+      <!-- sun top-left -->
+      <circle cx="48" cy="52" r="26" fill="#ffd34d"/>
+      <rect y="330" width="360" height="110" fill="#6cc36a"/>
+      <!-- sign with gibberish -->
+      <rect x="236" y="150" width="104" height="54" rx="6" fill="#2b5fa8"/>
+      <rect x="284" y="204" width="8" height="126" fill="#5b4632"/>
+      <text x="288" y="174" fill="#fff" font-size="13" text-anchor="middle" font-family="Montserrat,sans-serif" font-weight="700">ПАРҚҰӨ</text>
+      <text x="288" y="192" fill="#fff" font-size="11" text-anchor="middle" font-family="Montserrat,sans-serif">Ыңғәә кшӨ</text>
+      <!-- tree -->
+      <rect x="30" y="230" width="14" height="100" fill="#5b4632"/>
+      <circle cx="37" cy="220" r="34" fill="#3f9a4a"/>
+      <!-- shadow (wrong side: toward the sun) -->
+      <ellipse cx="120" cy="404" rx="70" ry="12" fill="rgba(0,0,0,.28)"/>
+      <!-- body -->
+      <path d="M120 250 Q170 236 220 250 L232 400 L108 400 Z" fill="#e94b5a"/>
+      <rect x="132" y="396" width="30" height="12" rx="4" fill="#222"/>
+      <rect x="178" y="396" width="30" height="12" rx="4" fill="#222"/>
+      <!-- neck/head -->
+      <rect x="158" y="214" width="24" height="30" fill="#f0c19a"/>
+      <ellipse cx="170" cy="170" rx="50" ry="58" fill="#f0c19a"/>
+      <path d="M118 160 Q122 104 170 104 Q220 104 222 160 Q206 128 170 130 Q134 128 118 160Z" fill="#2c1d14"/>
+      <!-- ears & earrings (different) -->
+      <ellipse cx="120" cy="176" rx="8" ry="13" fill="#e6b089"/>
+      <ellipse cx="220" cy="176" rx="8" ry="13" fill="#e6b089"/>
+      <circle cx="119" cy="196" r="6" fill="none" stroke="#ffd34d" stroke-width="3"/>
+      <path d="M216 190 l10 14 h-20z" fill="#3d8bff"/>
+      <!-- glasses: right arm melts into hair -->
+      <circle cx="150" cy="170" r="15" fill="rgba(255,255,255,.35)" stroke="#222" stroke-width="3"/>
+      <circle cx="192" cy="170" r="15" fill="rgba(255,255,255,.35)" stroke="#222" stroke-width="3"/>
+      <path d="M165 170 h12" stroke="#222" stroke-width="3"/>
+      <path d="M135 168 L121 164" stroke="#222" stroke-width="3"/>
+      <path d="M207 166 Q214 150 206 136 Q200 126 210 118" stroke="#222" stroke-width="3" fill="none"/>
+      <circle cx="150" cy="171" r="4" fill="#222"/><circle cx="192" cy="171" r="4" fill="#222"/>
+      <path d="M156 202 Q170 212 184 202" stroke="#a5523b" stroke-width="3" fill="none"/>
+      <!-- waving hand with 6 fingers -->
+      <path d="M220 256 Q252 250 262 214" stroke="#e94b5a" stroke-width="22" fill="none" stroke-linecap="round"/>
+      <ellipse cx="266" cy="200" rx="16" ry="14" fill="#f0c19a"/>
+      <g stroke="#f0c19a" stroke-width="7" stroke-linecap="round">
+        <path d="M254 192 L246 172"/><path d="M260 188 L256 164"/><path d="M266 187 L266 162"/><path d="M272 188 L276 164"/><path d="M278 192 L286 172"/><path d="M281 202 L296 194"/>
+      </g>
+      <!-- other arm -->
+      <path d="M122 258 Q104 310 118 350" stroke="#e94b5a" stroke-width="22" fill="none" stroke-linecap="round"/>
+      <circle cx="118" cy="356" r="11" fill="#f0c19a"/>
+      <!-- rings drawn when found -->
+      <g id="rings"></g>
+      <!-- hit zones -->
+      <circle class="hit" data-k="0" cx="270" cy="182" r="38"/>
+      <circle class="hit" data-k="1" cx="218" cy="196" r="22"/>
+      <rect class="hit" data-k="2" x="230" y="146" width="116" height="62"/>
+      <ellipse class="hit" data-k="3" cx="120" cy="404" rx="80" ry="24"/>
+      <circle class="hit" data-k="4" cx="208" cy="140" r="24"/>
+    </svg>
+  </div>
+  <ol class="found" id="spotList"></ol>
+  <div id="spotDone"></div>
+</div></section>
+
+<!-- game: report -->
+<section class="view" id="v-game-report"><div class="wrap">
+  <button class="back" data-go="games">← Ойындар</button>
+  <div class="row" style="justify-content:space-between;align-items:center"><h2>Кімге айтам?</h2><span class="counter" id="rpCount"></span></div>
+  <div id="rpBox"></div>
+</div></section>
+
+
+<!-- game: finance -->
+<section class="view" id="v-game-finance"><div class="wrap">
+  <button class="back" data-go="games">← Ойындар</button>
+  <div class="row" style="justify-content:space-between;align-items:center"><h2>Қаржылық қауіпсіздік</h2><span class="counter" id="fnCount"></span></div>
+  <div id="fnBox"></div>
+  <div class="panel">
+    <span class="eyebrow">Ақшаның 5 алтын ережесі</span>
+    <ol style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+      <li>SMS-код, PIN-код, CVV (картаның артындағы 3 сан) – тек сенікі. Оны банк те сұрамайды.</li>
+      <li>Банктен қоңырау шалса, тұтқаны қой да, ата-анаңа айт.</li>
+      <li>«Ақша аударсаң, екі есе қайтарамыз» – әрқашан алаяқтық.</li>
+      <li>Бейтаныс адам жіберген QR-кодты сканерлеп, төлем жасама.</li>
+      <li>Ойын ішіндегі сатып алуды ата-анаңмен келісіп жаса.</li>
+    </ol>
+  </div>
+  <div class="panel">
+    <span class="eyebrow">Ата-анаға: балаға карта бергенде</span>
+    <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+      <li>Балаға арналған банк карталарын (мысалы, Kaspi-дегі «Балаға арналған Kaspi Gold») ата-ана өз қосымшасынан ашады. Баланың шығынын сол жерден қадағалайды.</li>
+      <li>Интернеттегі сатып алуға айлық шектеу қойыңыз. Kaspi-де бұл «Жеке банк» → Балаға арналған Kaspi Gold → Әрекет → Интернетте төлеу жолымен жасалады.</li>
+      <li>Баламен келісіңіз: бейтаныс адамнан хабар келсе, ол ештеңе төлемей, алдымен сізге көрсетеді.</li>
+      <li>Ай сайын бірге шығынды қарап шығыңыз. Бұл бақылау ғана емес, қаржылық сауаттылық сабағы да.</li>
+    </ul>
+    <p class="small muted">Хабарлама мен шектеу баптаулары банкке байланысты өзгеруі мүмкін. Нақтысын банктің ресми қосымшасынан не анықтама қызметінен тексеріңіз.</p>
+  </div>
+</div></section>
+
+<!-- install -->
+<section class="view" id="v-install"><div class="wrap">
+  <button class="back" data-go="home">← Басты бет</button>
+  <h2>Телефонға қосымша етіп орнату</h2>
+  <p class="muted">Бір рет орнатсаң, DEEP SHIELD KZ телефонның басты экранында белгіше болып тұрады да, қосымша сияқты бір басумен ашылады.</p>
+  <div class="panel install"><b>Android (Chrome)</b><ol><li>Платформаны Chrome-да аш.</li><li>Оң жақ жоғарыдағы ⋮ мәзірін бас.</li><li>«Басты экранға қосу» (Add to Home screen) таңда.</li><li>Атын «Deep Shield» деп қалдырып, «Қосу» бас.</li></ol></div>
+  <div class="panel install"><b>iPhone (Safari)</b><ol><li>Платформаны Safari-де аш.</li><li>Төмендегі «Бөлісу» батырмасын (шаршы мен жоғары бағыт) бас.</li><li>«Басты экранға» (На экран «Домой») таңда.</li><li>«Қосу» бас.</li></ol></div>
+  <p class="small muted">Платформа интернетпен жұмыс істейді. Ұпайлар мен қалқан прогресі әр оқушының өз телефонында сақталады.</p>
+</div></section>
+
+<!-- ============ SCANNER ============ -->
+<section class="view" id="v-scan"><div class="wrap">
+  <h2>Бет-сканер</h2>
+  <a class="tile" href="#faceid" style="text-decoration:none;border-left:6px solid var(--accent)"><span class="eyebrow">Жаңа · камера</span><b>Face ID зертханасы</b><span class="small muted">Камерамен бетіңді тіркеп, телефонды «ашып» көр</span></a>
+  <p class="muted">Фотоны жүктесең, сканер файлдың ішіндегі деректерді оқиды, ал сен бет-әлпеттегі 8 белгіні өзің тексересің. Соңында күмән деңгейі шығады, ал ЖИ-талдау дипфэйк ықтималдығын пайызбен бағалайды.</p>
+  <div class="panel" id="scanStart">
+    <label class="drop" for="scanFile">
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#2ee6d6" stroke-width="1.6" aria-hidden="true"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><circle cx="12" cy="10" r="3"/><path d="M7 18c1-3 3-4 5-4s4 1 5 4"/></svg>
+      <b>Фото таңда</b>
+      <span class="small muted">Телефон галереясынан немесе скриншот. Файл деректері тек телефоныңда тексеріледі. «ЖИ-мен тексеру» батырмасын бассаң ғана фото талдауға жіберіледі.</span>
+    </label>
+    <input id="scanFile" type="file" accept="image/*" hidden>
+    <button class="btn ghost" id="scanDemo">Фото жоқ болса: үлгімен көру</button>
+  </div>
+  <div id="scanWork" style="display:none;flex-direction:column;gap:16px"></div>
+</div></section>
+
+
+<!-- ============ FACE ID ============ -->
+<section class="view" id="v-faceid"><div class="wrap">
+  <button class="back" data-go="scan">← Сканер</button>
+  <h2>Face ID зертханасы</h2>
+  <p class="muted">Камерамен бетіңді тіркеп, «телефонды» бетіңмен ашып көр. Сосын оны алдауға тырыс: Face ID қалай жұмыс істейтінін және неге бетің – сенің құпиясөзің екенін түсінесің.</p>
+  <div class="panel">
+    <div class="fstep on" id="fs1"><span class="num">1</span><span><b>Бетіңді тіркеу</b><br><span class="small muted">Алдыңғы камерамен селфи түсір</span></span></div>
+    <div class="fstep" id="fs2"><span class="num">2</span><span><b>Бетіңмен ашу</b><br><span class="small muted">Тағы бір селфи түсіріп, сәйкестікті тексер</span></span></div>
+    <div class="fstep" id="fs3"><span class="num">3</span><span><b>Алдап көр</b><br><span class="small muted">Фото, досың, көзілдірік: қайсысы өтеді?</span></span></div>
+  </div>
+  <div class="panel" id="fMain">
+    <label class="btn" for="fCam" style="text-align:center" id="fCamLbl">Камераны ашу</label>
+    <input id="fCam" type="file" accept="image/*" capture="user" hidden>
+    <div id="fStageWrap" style="display:none;flex-direction:column;gap:10px">
+      <div class="stage" id="fStage"><img id="fImg" alt="Түсірілген селфи"><svg id="fSvg"></svg></div>
+      <p class="small muted" id="fHint">Бет жақтауда тұруы керек. Қажет болса, бетіңе басып жақтауды жылжыт.</p>
+      <label for="fSize" class="small">Жақтау өлшемі</label>
+      <input id="fSize" type="range" min="20" max="95" value="60">
+      <button class="btn" id="fScan">Сканерлеу</button>
+    </div>
+    <div id="fResult" style="display:none;flex-direction:column;gap:12px"></div>
+  </div>
+  <div class="panel">
+    <span class="eyebrow">Шын Face ID қалай жұмыс істейді?</span>
+    <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+      <li><b>Нүктелер.</b> Телефон бетке 30 000-ға жуық көрінбейтін инфрақызыл нүкте шашып, беттің 3D картасын жасайды.</li>
+      <li><b>Бет коды.</b> Карта санға айналады. Телефон фотоңды емес, осы кодты сақтайды.</li>
+      <li><b>Салыстыру.</b> Әр ашқан сайын жаңа код сақталғанмен салыстырылады. Сәйкестік жоғары болса, ашылады.</li>
+      <li><b>Тірілік тексерісі.</b> Көзің ашық па, экранға қарап тұрсың ба, бет тереңдігі бар ма? Сол үшін жай фото не дипфэйк видео шын Face ID-ді ашпайды.</li>
+    </ul>
+    <p class="small muted">Біздің зертханадағы сканер оқуға арналған қарапайым модель: ол тек 2D суреттің жарық-көлеңкесін салыстырады. Сондықтан оны алдау оңайырақ, ал бұл – сабақтың өзі.</p>
+  </div>
+  <div class="panel">
+    <span class="eyebrow">Биометриямды қорғаймын</span>
+    <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+      <li>Бетің, дауысың, саусақ ізің – биометриялық дерек. Құпиясөзді ауыстыруға болады, бетті ауыстыра алмайсың.</li>
+      <li>«Бетіңді сканерле, сыйлық ал», «Қандай жұлдызға ұқсайсың?» деген күмәнді қосымшаларға бетіңді берме.</li>
+      <li>Бетің анық көрінетін көп фотоны ашық жарияламасаң, сенің бетіңнен дипфэйк жасау қиындайды.</li>
+      <li>Телефонды Face ID-мен бірге құпиясөзбен де қорға, оны ешкімге айтпа.</li>
+    </ul>
+  </div>
+  <p class="small muted">Селфилер ешқайда жіберілмейді, сақталмайды. Олар тек осы беттің жадында тұрады, бетті жапсаң өшеді.</p>
+</div></section>
+
+<!-- ============ TEST ============ -->
+<section class="view" id="v-test"><div class="wrap">
+  <div class="row" style="justify-content:space-between;align-items:center"><h2>Тест: Цифрлық қорғаушы</h2><span class="counter" id="tCount"></span></div>
+  <div id="tBox"></div>
+</div></section>
+
+<!-- ============ RIGHTS ============ -->
+<section class="view" id="v-rights"><div class="wrap">
+  <h2>Менің цифрлық құқығым</h2>
+  <p class="muted">Интернетте де сенің құқығың заңмен қорғалады. Әр бөлімді ашып оқы.</p>
+  <div class="panel" id="kidRights"></div>
+  <div id="lawsHead" class="eyebrow">Заңдар</div>
+  <div id="laws" style="display:flex;flex-direction:column;gap:10px"></div>
+  <div class="panel">
+    <span class="eyebrow">Көмек керек болса</span>
+    <div class="phones">
+      <div class="phone"><b>150</b><span class="small">Балалар мен жасөспірімдерге арналған сенім телефоны</span></div>
+      <div class="phone"><b>102</b><span class="small">Полиция</span></div>
+      <div class="phone"><b>112</b><span class="small">Бірыңғай құтқару қызметі</span></div>
+    </div>
+    <p class="small muted">Алдымен өзің сенетін ересекке айт: ата-анаң, сынып жетекшің, мектеп психологы.</p>
+  </div>
+  <p class="small muted">Заңдардың толық мәтіні: adilet.zan.kz. Бұл бөлім оқушыларға арналған қысқаша түсіндірме, заң кеңесі емес.</p>
+</div></section>
+
+<!-- ============ QR ============ -->
+<section class="view" id="v-qr"><div class="wrap">
+  <button class="back" data-go="home">← Басты бет</button>
+  <h2>QR-код жасау</h2>
+  <div class="panel">
+    <label for="qrLink"><b>Платформаның сілтемесін қой</b></label>
+    <input id="qrLink" type="url" placeholder="https://claude.ai/...">
+    <button class="btn" id="qrMake">QR жасау</button>
+    <div id="qrout" style="display:none"></div>
+    <p class="small muted">Оқушылар телефон камерасымен QR-ды сканерлесе, платформа ашылады. QR-ды тақтаға шығар немесе скриншот жасап, басып шығар.</p>
+  </div>
+</div></section>
+
+<div id="agePick" style="display:none"><div class="agebox">
+ <div style="width:110px;height:128px;margin:0 auto" id="ageBuddy"></div>
+ <h2 style="text-align:center">Неше жастасың?</h2>
+ <p class="muted" style="text-align:center">Жасыңды таңда, мен саған лайық ойындар мен сұрақтар дайындаймын!</p>
+ <button class="agebtn" data-a="small"><span>🐣</span><b>6–8 жас</b><small>1–2 сынып</small></button>
+ <button class="agebtn" data-a="mid"><span>🚀</span><b>9–11 жас</b><small>3–5 сынып</small></button>
+ <button class="agebtn" data-a="big"><span>🦅</span><b>12 жас және үлкен</b><small>6–11 сынып</small></button>
+</div></div>
+<div id="buddy"><div class="say" id="buddySay">Сәлем! Мен Сақболмын. Интернетте бірге сақ боламыз!</div><button id="buddyBtn" aria-label="Көмекші Сақбол: кеңес алу"><svg viewBox="0 0 120 140" aria-hidden="true"><g class="bob">
+<ellipse cx="60" cy="136" rx="30" ry="4" fill="rgba(29,79,168,.18)"/>
+<path d="M30 132 Q30 96 60 96 Q90 96 90 132Z" fill="#2f7df6"/>
+<path d="M60 100 l14 5v10c0 9-6 14-14 17-8-3-14-8-14-17v-10Z" fill="#ffd34d" stroke="#fff" stroke-width="2"/>
+<path d="M54 113l4 4 8-8" stroke="#1c2a4d" stroke-width="3" fill="none" stroke-linecap="round"/>
+<path d="M88 112 q14 -6 18 -22" stroke="#f3c29b" stroke-width="9" stroke-linecap="round" fill="none"/>
+<circle cx="107" cy="86" r="7" fill="#f3c29b"/>
+<circle cx="60" cy="62" r="34" fill="#f6cba6"/>
+<ellipse cx="26" cy="64" rx="6" ry="9" fill="#efb68e"/><ellipse cx="94" cy="64" rx="6" ry="9" fill="#efb68e"/>
+<path d="M28 50 Q30 26 60 26 Q90 26 92 50 Q78 40 60 40 Q42 40 28 50Z" fill="#3a2516"/>
+<path d="M27 44 Q28 12 60 12 Q92 12 93 44 Z" fill="#1b9e6e"/>
+<path d="M27 44 h66" stroke="#ffd34d" stroke-width="5"/>
+<path d="M40 30 q5 -8 10 0 q5 8 10 0 q5 -8 10 0 q5 8 10 0" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>
+<circle cx="60" cy="14" r="4" fill="#ffd34d"/>
+<g class="norm"><ellipse cx="47" cy="62" rx="5" ry="6.5" fill="#1c2a4d"/><ellipse cx="73" cy="62" rx="5" ry="6.5" fill="#1c2a4d"/><circle cx="49" cy="60" r="2" fill="#fff"/><circle cx="75" cy="60" r="2" fill="#fff"/><path d="M50 78 Q60 86 70 78" stroke="#a34a33" stroke-width="3.5" fill="none" stroke-linecap="round"/></g>
+<g class="happy"><path d="M41 63 q6 -8 12 0M67 63 q6 -8 12 0" stroke="#1c2a4d" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M48 76 Q60 92 72 76Z" fill="#a34a33"/></g>
+<g class="sad"><ellipse cx="47" cy="63" rx="4.5" ry="5.5" fill="#1c2a4d"/><ellipse cx="73" cy="63" rx="4.5" ry="5.5" fill="#1c2a4d"/><path d="M41 52 l10 3M79 52 l-10 3" stroke="#3a2516" stroke-width="3" stroke-linecap="round"/><path d="M52 82 Q60 76 68 82" stroke="#a34a33" stroke-width="3.5" fill="none" stroke-linecap="round"/></g>
+<circle cx="38" cy="74" r="5" fill="#ff9fb0" opacity=".6"/><circle cx="82" cy="74" r="5" fill="#ff9fb0" opacity=".6"/>
+</g></svg></button></div>
+<nav class="tabs" aria-label="Бөлімдер">
+  <a href="#home" data-t="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 21 6v6c0 5-4 9-9 10-5-1-9-5-9-10V6Z"/></svg>Басты</a>
+  <a href="#steps" data-t="steps"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>5 қадам</a>
+  <a href="#games" data-t="games"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="11" rx="4"/><path d="M7 11v3M5.5 12.5h3M16 12h.01M18 14h.01"/></svg>Ойындар</a>
+  <a href="#scan" data-t="scan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><circle cx="12" cy="11" r="3"/></svg>Сканер</a>
+  <a href="#test" data-t="test"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg>Тест</a>
+  <a href="#rights" data-t="rights"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 7h14M5 7l-3 7a4 4 0 0 0 6 0ZM19 7l-3 7a4 4 0 0 0 6 0Z"/></svg>Құқық</a>
+</nav>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+/* ---------- data ---------- */
+const ICONS={stop:"✋",check:"🔍",compare:"⚖️",protect:"🛡️",report:"📢"};
+const STEPS=[
+ {k:"stop",c:"var(--stop)",t:"ТОҚТА",s:"Күмәнді ақпаратты таратпа",
+  d:["Таң қалдыратын, қорқытатын не ашуландыратын хабарды көрсең, бірден бөліспе.","«Барлығына тарат!», «Шұғыл!», «Ешкімге айтпа!» деген сөздер – алаяқтардың басты тәсілі.","10 секунд күт те, өзіңнен сұра: бұны кім, не үшін жасады?"],game:"game-fakereal"},
+ {k:"check",c:"var(--check)",t:"ТЕКСЕР",s:"Дереккөзін анықта",
+  d:["Авторы кім? Ресми парақша ма, әлде жаңа ашылған аккаунт па?","Жарияланған күні бар ма? Ескі видео жаңа жаңалық болып таралуы мүмкін.","Видеода ерін мен дауыстың сәйкестігін, көздің жыпылықтауын, бет шетін қара."],game:"scan"},
+ {k:"compare",c:"var(--compare)",t:"САЛЫСТЫР",s:"Ақпараттарды салыстыр",
+  d:["Дәл осы жаңалықты кемі 2 сенімді дереккөзден тап: ресми сайт, белгілі БАҚ.","Суретті Google Lens не Яндекс суреттер арқылы іздеп, алғашқы нұсқасын тап.","Бір ғана жерде жазылған «сенсация» көбіне жалған болады."],game:"game-spot"},
+ {k:"protect",c:"var(--protect)",t:"ҚОРҒА",s:"Цифрлық құқығыңды біл",
+  d:["Сенің фотоң, дауысың, ЖСН-ің, мекенжайың – дербес деректер. Оларды бөтенге берме.","SMS-код пен құпиясөзді ешкімге айтпа: мұғалімге де, «банк қызметкеріне» де.","Аккаунтыңа екі қадамды тексеруді қос, профильді жабық ет."],game:"rights"},
+ {k:"report",c:"var(--report)",t:"ХАБАРЛА",s:"Қауіпті жағдайда сенімді ересекке айт",
+  d:["Сені қорқытса, бопсаласа немесе сенің атыңнан жалған видео жасаса, жасырма.","Скриншот жасап, сілтемені сақта. Жауап берме, ақша аударма.","Ата-анаңа, сынып жетекшіңе айт. Қажет болса: 150 сенім телефоны, 102 полиция."],game:"game-report"}
+];
+
+const FR=[
+ {from:"Instagram · танымал әншінің видеосы",m:"«Менің атымнан үлкен ұтыс! Сілтемеге өтіп, банк картаңның нөмірін жаз, 100 000 ₸ ұтып ал!»",o:["Шын, қатысамын","Жалған: дипфэйк-алаяқтық","Досыма жіберіп көрейін"],a:1,e:"Танымал адамдар карта нөмірін сұрамайды. Мұндай видеоны ЖИ арқылы жасайды: ерін қимылы дауысқа сәйкес келмейді. Әншінің ресми парақшасын тексер."},
+ {from:"WhatsApp · сыныптасың (дауыстық хабар)",m:"«Шұғыл 5000 ₸ аударшы, кешке қайтарамын. Қоңырау шалма, қазір сөйлей алмаймын.»",o:["Бірден аударамын","Күмәнді: өзім қоңырау шалып тексеремін","Жауап бермей, номерді бөгеймін"],a:1,e:"Дауысты ЖИ 3 секундтық жазбадан көшіре алады. «Қоңырау шалма» деуі – белгі. Досыңа өзің қоңырау шал не екеуің ғана білетін сұрақ қой."},
+ {from:"Мектептің ресми парақшасы + kundelik.kz",m:"«Ертең 3-сабақтан кейін мектепте Республика күніне арналған концерт болады.»",o:["Шын: екі ресми дереккөз растайды","Жалған","Күмәнді"],a:0,e:"Ақпарат мектептің ресми парақшасында да, күнделікте де бар. Екі сенімді дереккөз бір-бірін растаса, сенуге болады."},
+ {from:"Telegram · авторы белгісіз скриншот",m:"«ЕРТЕҢ БАРЛЫҚ МЕКТЕПТЕР ЖАБЫЛАДЫ!!! Барлығына тарат!»",o:["Тез таратамын","Тоқтаймын: авторы, күні жоқ, ресми хабарландыру жоқ","Шын, демалыс!"],a:1,e:"Авторы мен күні жоқ, үлкен әріппен жазылған, «тарат» деп талап ететін хабар – фейк белгісі. Ресми хабарландыруды министрлік не мектеп сайтынан тексер."},
+ {from:"TikTok · «сенсация» фото",m:"«Балқашта 5 метрлік акула ұсталды!» Фотода судың шеті бұлыңғыр, балықшының қолында 6 саусақ.",o:["Шын, керемет!","Жалған: ЖИ жасаған сурет","Тексермей-ақ лайк басамын"],a:1,e:"Балқаш көлі тұщы, онда акула жоқ. Саусақ санының қателігі, бұлыңғыр шеттер – ЖИ суретінің белгілері."},
+ {from:"Telegram бот",m:"«Ойындағы 10 000 алмасты тегін ал! Тек телефоныңа келген SMS-кодты жібер.»",o:["Кодты жіберемін","Жалған: SMS-код ешкімге берілмейді","Ата-анамның номерін жазамын"],a:1,e:"SMS-код – аккаунтыңның кілті. Оны берсең, аккаунтыңды ұрлайды. Тегін сыйлық уәде етіп код сұрау – алаяқтық."},
+ {from:"Ақпарат агенттігі + тағы 2 БАҚ",m:"Жаңалықта дереккөз көрсетілген, дәл осы деректер тағы екі белгілі сайтта бар.",o:["Шын: дереккөз бар, басқа сайттар растайды","Жалған","Бәрібір сенбеймін"],a:0,e:"Дереккөзі ашық көрсетілген және бірнеше тәуелсіз басылым растаған ақпаратқа сенуге болады. Салыстыру – сенімнің кілті."},
+ {from:"Instagram · досыңның жаңа «фотосы»",m:"Досыңның концерттегі фотосы. Бірақ артындағы жазу түсініксіз әріптер, екі құлағындағы сырға әртүрлі.",o:["Шын","Күмәнді: ЖИ жасаған болуы мүмкін, досымнан сұраймын","Жалған деп пікір жазып, мазақтаймын"],a:1,e:"Түсініксіз жазу, асимметриялы әшекей – ЖИ белгілері. Бірақ біреуді жария мазақтау – кибербуллинг. Досыңнан жеке сұра."},
+ {from:"YouTube · «әкімнің мәлімдемесі»",m:"Видеода әкім «ертеңнен бастап тегін жол жүру жойылады» дейді. Көзін мүлдем жыпылықтатпайды, дауысы бірқалыпты.",o:["Шын, таратамын","Күмәнді: ресми сайттан тексеремін","Пікірге ұрсамын"],a:1,e:"Көз жыпылықтамауы, «роботтай» бірқалыпты дауыс – дипфэйк белгілері. Ресми шешімдер gov.kz сайтында жарияланады."},
+ {from:"Бейтаныс аккаунт · жеке хат",m:"«Сенің фотоңнан видео жасадым. 10 000 ₸ жібер, әйтпесе барлығына таратамын. Ешкімге айтпа!»",o:["Ақша жіберемін","Жауап бермей, скриншот сақтап, ересекке айтамын","Ұялып, ешкімге айтпаймын"],a:1,e:"Бұл бопсалау. Ақша жіберме: олар тоқтамайды. Скриншот жаса, ата-анаңа не сынып жетекшіңе айт. Көмек: 150, 102. Сен кінәлі емессің."}
+];
+
+const SPOT=[
+ {t:"Қолда 6 саусақ бар",cx:270,cy:182,r:40},
+ {t:"Екі сырға әртүрлі: біреуі дөңгелек, біреуі үшбұрыш",cx:218,cy:196,r:24},
+ {t:"Тақтадағы жазу мағынасыз әріптерден тұрады",cx:288,cy:177,r:62},
+ {t:"Күн сол жақта, ал көлеңке де сол жаққа түсіп тұр",cx:120,cy:404,r:56},
+ {t:"Көзілдіріктің сабы шашқа «еріп» жоғалып кеткен",cx:208,cy:140,r:26}
+];
+
+const RP=[
+ {m:"Біреу сенің фотоңды сұрамай сынып чатына күлкілі қолтаңбамен жариялады.",o:["Үндемеймін","Скриншот жасап, сынып жетекшіге айтамын, платформаға шағым түсіремін","Оның да фотосын жариялаймын"],a:1,e:"Кек алу жағдайды ушықтырады. Дәлел сақта, ересекке айт, «Шағымдану» батырмасын бас."},
+ {m:"Ойында танысқан «құрдасың» жеке фотоңды сұрап, ешкімге айтпауды өтінеді.",o:["Жіберемін, ол менің досым","Жібермеймін, ата-анама айтамын","Басқа біреудің фотосын жіберемін"],a:1,e:"Интернетте адам өзін кім деп таныстырса да, басқа адам болуы мүмкін. «Ешкімге айтпа» – қауіп белгісі. Ересекке айт."},
+ {m:"Сенің дауысыңмен жасалған жалған аудио таралып жүр, онда сен мұғалімді жамандайсың.",o:["Ұялып, мектепке бармаймын","Ата-анама және сынып жетекшіге бірден айтып, аудионың жалған екенін түсіндіремін","Жауап ретінде басқа аудио жасаймын"],a:1,e:"Сенің атыңнан жасалған дипфэйк – сенің кінәң емес. Ересектер көмектесіп, платформадан жоюды сұрай алады. ЖИ туралы заң бойынша мұндай контент үшін жауапкершілік бар."},
+ {m:"Сыныптасыңды топ чатта күнде мазақтап, оның суреттерін өзгертіп жүр.",o:["Мен де күлемін","Қолдау білдіріп, бұл туралы сынып жетекшіге хабарлаймын","Чаттан шығып кетемін, маған бәрібір"],a:1,e:"Бұл – кибербуллинг. Куәгер үндемесе, буллинг жалғаса береді. Сыныптасыңа «мен сенің жағыңдамын» деп жаз, ересекке айт."},
+ {m:"«Банк қызметкері» қоңырау шалып, ата-анаңның картасындағы 3 цифрды сұрады.",o:["Айтамын, ол банктен ғой","Тұтқаны қойып, ата-анама бірден айтамын","Жартысын ғана айтамын"],a:1,e:"Банк ешқашан карта деректерін не кодты телефонмен сұрамайды. Тұтқаны қой да, ата-анаңа айт."},
+ {m:"Біреу сені «барлығына таратамын» деп қорқытып, ақша сұрап жатыр. Сен қатты қорқып тұрсың.",o:["Ешкімге айтпай, шыдаймын","Сенетін ересекке бірден айтамын, қажет болса 150-ге хабарласамын","Ақша тауып беремін"],a:1,e:"Қорқу – қалыпты. Бірақ мұндай жағдайды жалғыз шешпе. 150 – балалар мен жасөспірімдерге арналған тегін сенім телефоны. Қауіп төнсе: 102."}
+];
+
+const TQ=[
+ {q:"Дипфэйк дегеніміз не?",o:["Телефонның жаңа моделі","ЖИ арқылы адамның беті не дауысы өзгертіліп жасалған жалған видео, фото не аудио","Әлеуметтік желідегі ойын","Антивирус бағдарламасы"],a:1},
+ {q:"Күмәнді хабар алдың. Бірінші не істейсің?",o:["Бірден таратамын","Тоқтаймын, таратпаймын","Пікір жазамын","Лайк басамын"],a:1},
+ {q:"Ақпаратты тексерудің ең сенімді жолы?",o:["Көп лайк жинағанына қарау","Досымнан сұрау","Ресми дереккөзден табу және кемі 2 тәуелсіз дереккөзбен салыстыру","Тақырыбын оқу"],a:2},
+ {q:"Видеодағы дипфэйктің белгісі қайсы?",o:["Ерін қимылы дауысқа сәйкес келмейді","Видео түрлі түсті","Видео ұзақ","Музыкасы бар"],a:0},
+ {q:"ЖИ жасаған фотоның жиі кездесетін белгісі?",o:["Фото жарық","Саусақ саны қате, фондағы жазу мағынасыз","Фото көлденең","Адам күліп тұр"],a:1},
+ {q:"Досың дауыстық хабармен ақша сұрады, дауысы біртүрлі. Не істейсің?",o:["Аударамын","Өзім қоңырау шалып, тек екеуміз білетін сұрақ қоямын","Хабарды досыма жіберемін","Ештеңе істемеймін"],a:1},
+ {q:"SMS-кодты кімге айтуға болады?",o:["Банк қызметкеріне","Досыма","Ойын әкімшісіне","Ешкімге"],a:3},
+ {q:"Мыналардың қайсысы дербес деректерге жатады?",o:["ЖСН","Үй мекенжайы мен телефон нөмірі","Сенің фотоң мен дауысың","Барлығы"],a:3},
+ {q:"Біреу фотоңды рұқсатсыз жариялады. Дұрыс әрекет?",o:["Скриншот сақтап, ересекке айтамын, платформаға шағымданамын","Оның да фотосын жариялаймын","Аккаунтымды жоямын","Үндемеймін"],a:0},
+ {q:"Қазақстанда балалар мен жасөспірімдерге арналған сенім телефоны?",o:["101","103","150","104"],a:2},
+ {q:"Қазақстанда «Жасанды интеллект туралы» заңға қай жылы қол қойылды?",o:["2015","2020","2025","2030"],a:2},
+ {q:"Кибербуллинг дегеніміз?",o:["Онлайн сабақ","Интернетте біреуді қорлау, қорқыту, мазақтау","Компьютерлік ойын","Видео монтаж"],a:1},
+ {q:"Мықты құпиясөз қандай?",o:["123456","Өз атым","Ұзын, әріп, сан, таңбадан тұратын, әр сайтқа бөлек","Туған күнім"],a:2},
+ {q:"Интернетте қауіп төнсе, кімге айтасың?",o:["Бейтаныс адамға","Сенетін ересекке: ата-ана, сынып жетекші, мектеп психологы","Ешкімге","Тек чатқа"],a:1},
+ {q:"«Барлығына тарат!» деп жазылған авторы жоқ хабар – бұл…",o:["Міндетті түрде шын","Жиі кездесетін фейк белгісі","Ресми хабарландыру","Мұғалімнің тапсырмасы"],a:1}
+];
+
+const LAWS=[
+ {tag:"Конституция",t:"Жеке өмірге қол сұқпаушылық",b:"<p>ҚР Конституциясы әр адамның жеке өміріне қол сұқпауға, өзінің және отбасының құпиясы болуына, ар-намысы мен абыройлы атын қорғауға құқығын кепілдендіреді. Хат-хабар мен телефон сөйлесулерінің құпиясы да қорғалады.</p><p class='small muted'>Яғни сенің жеке хатыңды, фотоңды, видеоңды рұқсатсыз жариялауға болмайды.</p>"},
+ {tag:"Заң",t:"«Дербес деректер және оларды қорғау туралы» ҚР Заңы",b:"<ul><li>Дербес деректер: аты-жөнің, ЖСН, мекенжай, телефон, фото, дауыс және т.б.</li><li>Оларды жинау, сақтау, тарату тек иесінің келісімімен рұқсат етіледі.</li><li>Кәмелетке толмаған баланың атынан келісімді ата-анасы не заңды өкілі береді.</li></ul>"},
+ {tag:"Заң",t:"«Қазақстан Республикасындағы баланың құқықтары туралы» Заң",b:"<ul><li>Бала ар-намысы мен қадір-қасиетін қорғауға құқылы.</li><li>Заңда кибербуллинг ұғымы бар: интернетте баланы қорлау, қорқыту, мазақтау.</li><li>Ата-ана мен заңды өкілдер баланы кибербуллингтен қорғау үшін уәкілетті органға жүгіне алады.</li></ul>"},
+ {tag:"Заң · 2025",t:"«Жасанды интеллект туралы» ҚР Заңы",b:"<ul><li>Мемлекет басшысы бұл заңға 2025 жылғы 17 қарашада қол қойды.</li><li>ЖИ жасаған контентті таңбалау талабы енгізілді, бұл дипфэйк жасауды қиындатады.</li><li>Ресми контентті дипфэйк жасауға пайдаланғаны үшін әкімшілік және қылмыстық жауапкершілік көзделген.</li><li>Пайдаланушыға ЖИ жүйесінің мүмкіндіктері мен шектеулері туралы ақпарат берілуі тиіс.</li></ul>"},
+ {tag:"Кодекс",t:"Өз бейнеңе құқық",b:"<p>Азаматтық кодекс бойынша адамның бейнесін (фото, видео) оның келісімінсіз пайдалануға болмайды. Сенің бетіңді дипфэйкке салу – сенің құқығыңды бұзу.</p>"},
+ {tag:"Не істеймін?",t:"Құқығым бұзылса",b:"<ol style='margin:0;padding-left:18px'><li>Жауап берме, ақша аударма.</li><li>Скриншот жаса, сілтемені, күнін сақта.</li><li>Сенетін ересекке айт.</li><li>Платформада «Шағымдану» батырмасын бас.</li><li>Қажет болса: 150 сенім телефоны, 102 полиция.</li></ol>"}
+];
+
+
+const FN=[
+ {m:"Біреу қоңырау шалып: «Мен банк қызметкерімін, картаңыз бұғатталды. Телефоныңызға келген кодты айтыңыз» дейді.",o:["Кодты айтамын","Тұтқаны қойып, ата-анама айтамын","Картаның нөмірін ғана айтамын"],a:1,e:"Банк ешқашан кодты телефонмен сұрамайды. Код – аккаунттың кілті. Тұтқаны қой."},
+ {m:"Instagram-да: «Kaspi-ден 50 000 ₸ сыйлық! Сілтемеге өтіп, логин мен құпиясөзіңді енгіз».",o:["Енгіземін","Бұл фишинг: өтпеймін, ересекке көрсетемін","Досыма жіберемін"],a:1,e:"Банктің атын пайдаланып жасалған жалған сайт – фишинг. Банк сыйлығы тек ресми қосымшада болады."},
+ {m:"Ойын чатында: «1000 ₸ жібер, саған 10 000 ₸-лік ойын валютасын береміз».",o:["Жіберемін","Жібермеймін: бұл алаяқтық","Жартысын жіберемін"],a:1,e:"Ойын валютасын тек ойынның ресми дүкенінен ата-анаңмен бірге сатып ал. Бейтаныс адамға алдын ала ақша аудару – алаяқтықтың ең жиі түрі."},
+ {m:"Бейтаныс адам: «Қате аударып жібердім, 5000 ₸-ні қайтаршы» деп жазды. Картаға шынымен ақша түскен.",o:["Сол нөмірге бірден қайтарамын","Ешнәрсе аудармай, ата-анама көрсетемін","Ақшаны жұмсаймын"],a:1,e:"Бұл айлалы схема болуы мүмкін: ақша ұрланған картадан келуі ықтимал. Мәселені ата-анаң банк арқылы шешеді."},
+ {m:"Дүкенде бейтаныс адам: «Телефоныңмен мына QR-ды сканерлеп, төлеп жібер, мен саған қолма-қол беремін».",o:["Көмектесемін","Бас тартамын","Жартысын төлеймін"],a:1,e:"Бөгде адамның QR-ы арқылы төлесең, ақшаң кімге кеткенін білмейсің. Сенің карта арқылы алаяқтар ақша «жуа» алады."},
+ {m:"Досың: «Картаңды бір күнге бере тұршы, ақша түседі, кейін шешіп аламын» дейді.",o:["Беремін, ол досым ғой","Бермеймін: картамды ешкімге бермеймін","Тек PIN-кодын айтамын"],a:1,e:"Картаны біреуге беру – қауіпті. Оның атынан заңсыз ақша өтсе, жауапкершілік карта иесіне түседі. Мұндай адамдарды «дроп» деп атайды."},
+ {m:"Қосымшада «Ата-анаңның картасын байланыстыр, ойын тегін болады» деген терезе шықты.",o:["Ата-анамның картасын жазамын","Жабамын, ата-анамнан сұраймын","Карта суретін жіберемін"],a:1,e:"«Тегін» деп карта сұрау – жасырын жазылым не алаяқтық. Ата-ананың картасын тек олардың рұқсатымен ғана қолдан."},
+ {m:"Видеода танымал блогер: «Маған 2000 ₸ жіберсеңдер, ертең 20 000 ₸ қайтарамын!» дейді. Ерні дауысына сәйкес келмейді.",o:["Жіберемін","Бұл дипфэйк-алаяқтық: таратпаймын, шағым түсіремін","Пікірге картамды жазамын"],a:1,e:"«Екі есе қайтарамын» – әрқашан алаяқтық. Ерін мен дауыстың сәйкес келмеуі – дипфэйк белгісі. ТОҚТА, ТЕКСЕР, ХАБАРЛА."}
+];
+
+
+/* ---------- age levels ---------- */
+const AGES={small:{t:"6–8 жас",e:"🐣",n:6},mid:{t:"9–11 жас",e:"🚀",n:99},big:{t:"12+ жас",e:"🦅",n:99}};
+let AGE=null;try{AGE=localStorage.getItem("dsk-age")}catch(e){}
+if(!AGES[AGE])AGE=null;
+const kidMode=()=>AGE!=="big";
+const STEPS_K={
+ stop:["Біртүрлі не қорқынышты хабар көрсең – ТОҚТА!","Оны ешкімге бірден жіберме."],
+ check:["Кім жазды? Ол адамды танисың ба?","Суретке мұқият қара: саусақтар, құлақтар, жазулар дұрыс па?"],
+ compare:["Анаңнан не мұғаліміңнен сұра: «Бұл рас па?»","Басқа жерден де тауып көр."],
+ protect:["Атыңды, мекенжайыңды, мектебіңді бейтаныс адамға айтпа.","Суретіңді де, телефонға келген кодты да ешкімге жіберме."],
+ report:["Қорықсаң не ұялсаң да – ересекке айт!","Анаң, әкең, мұғалімің көмектеседі. Сенім телефоны: 150."]
+};
+const FR_K=[
+ {from:"Видео · мультфильм кейіпкері",m:"«Анаңның телефонына келген кодты айтсаң, саған сыйлық беремін!»",o:["Айтамын, сыйлық керек","Айтпаймын, анама көрсетемін"],a:1,e:"Сыйлық беремін деп код сұраса – ол алдамшы. Кодты ешкімге айтпаймыз."},
+ {from:"Ойын чаты · бейтаныс бала",m:"«Сен қай үйде тұрасың? Нешінші мектепте оқисың?»",o:["Айтамын","Айтпаймын"],a:1,e:"Үйіңді, мектебіңді бейтаныс адамға айтпайсың. Интернетте ол бала емес, үлкен адам болуы мүмкін."},
+ {from:"Мектептің өз парақшасы",m:"«Жұма күні мектепте Жаңа жыл ертеңгілігі болады.»",o:["Шын: мектептің өз парақшасы","Жалған"],a:0,e:"Мектептің ресми парақшасына сенуге болады. Мұғаліміңнен де сұрап көр."},
+ {from:"Сурет",m:"Суретте мысық ұшып жүр, ал оның 3 құлағы бар.",o:["Шын","Жалған: оны компьютер жасаған"],a:1,e:"Мысықтар ұшпайды, құлағы екеу! Мұндай суреттерді жасанды интеллект жасайды."},
+ {from:"Хабарлама",m:"«Бұны 10 адамға жібер, әйтпесе бір жаман нәрсе болады!»",o:["Қорқып, жіберемін","Жібермеймін, ересекке көрсетемін"],a:1,e:"Бұл бос қорқыту, ештеңе болмайды. Мұндай хабарды тарату керек емес."},
+ {from:"Дауыстық хабар",m:"Досыңның дауысымен: «Маған ақша жібер». Бірақ досың қасыңда отыр!",o:["Ақша жіберемін","Бұл жалған дауыс! Ересекке айтамын"],a:1,e:"Компьютер біреудің дауысын көшіре алады. Сондықтан дауысқа ғана сенбейміз."},
+ {from:"Видео · әнші",m:"«Тегін телефон таратамын! Сілтемені басып, атыңды жаз!»",o:["Басамын","Баспаймын: тегін телефон таратпайды"],a:1,e:"Ешкім тегін телефон таратпайды. Бұл алдау."},
+ {from:"Мұғалім сыныпта айтты",m:"«Ертең сурет сабағына түрлі түсті қарындаш әкеліңдер.»",o:["Шын","Жалған"],a:0,e:"Мұғалімнің өзі айтты – бұл шын ақпарат."}
+];
+const RP_K=[
+ {m:"Біреу чатта сені «ақымақ» деп мазақтады.",o:["Мен де жамандаймын","Жауап бермей, анама не мұғаліміме көрсетемін"],a:1,e:"Жамандыққа жамандықпен жауап бермейміз. Ересекке көрсет, олар көмектеседі."},
+ {m:"Бейтаныс адам: «Суретіңді жібер, бірақ ешкімге айтпа» деп жазды.",o:["Жіберемін","Жібермеймін, ата-анама айтамын"],a:1,e:"«Ешкімге айтпа» деген сөз – қауіп белгісі. Әрқашан ата-анаңа айт."},
+ {m:"Ойын ойнап отырғанда қорқынышты сурет шықты.",o:["Жалғыз қарай беремін","Жауып, ересекке айтамын"],a:1,e:"Дұрыс! Экранды жауып, ересекке айт. Сен ештеңеге кінәлі емессің."},
+ {m:"Біреу сыныптасыңның суретін күлкілі етіп өзгертіп жіберді.",o:["Күлемін, тағы таратамын","Таратпаймын, мұғалімге айтамын"],a:1,e:"Біреуді мазақтау оны ренжітеді. Таратпаймыз, ересекке айтамыз."},
+ {m:"Сен интернетте бір нәрседен қорқып қалдың, ал ата-анаң жұмыста.",o:["Ешкімге айтпаймын","Мұғаліміме айтамын не 150-ге қоңырау шаламын"],a:1,e:"150 – балаларға арналған тегін сенім телефоны. Онда сені тыңдап, көмектеседі."}
+];
+const FN_K=[
+ {m:"Ойын: «Тегін алмас алу үшін анаңның картасын суретке түсіріп жібер».",o:["Жіберемін","Жібермеймін, анама айтамын"],a:1,e:"Картаның суретін ешкімге жібермейміз. Бұл – алдау."},
+ {m:"Біреу: «Телефоныңа келген 4 санды айтшы» деп жазды.",o:["Айтамын","Айтпаймын"],a:1,e:"Ол сандар – құпия кілт. Кілтті бөтенге бермейміз!"},
+ {m:"Анаңның телефонында ойын ішінде «Сатып алу» батырмасы шықты.",o:["Басамын","Алдымен анамнан сұраймын"],a:1,e:"Дұрыс! Сатып алуды тек ата-анаңмен бірге жасайсың."},
+ {m:"Бейтаныс адам: «Мына QR-ды телефоныңмен сканерлесең, саған сағат сыйлаймын».",o:["Сканерлеймін","Бас тартып, ересекке айтамын"],a:1,e:"Бейтаныс адамның QR-ы сенің ақшаңды алып қоюы мүмкін."},
+ {m:"Ойындағы досың: «Анаңның картасының нөмірін біліп келші».",o:["Біліп келемін","Жоқ! Бұл туралы анама айтамын"],a:1,e:"Нағыз дос картаның нөмірін сұрамайды. Ата-анаңа айт."}
+];
+const TQ_K=[
+ {q:"Дипфэйк дегеніміз не?",o:["Компьютер жасаған жалған сурет не видео","Жаңа ойыншық","Мультфильм"],a:0},
+ {q:"Біртүрлі хабар көрсең, алдымен не істейсің?",o:["Бәріне жіберемін","Тоқтаймын","Күлемін"],a:1},
+ {q:"Телефонға келген кодты кімге айтуға болады?",o:["Досыма","Ойындағы адамға","Ешкімге"],a:2},
+ {q:"Бейтаныс адам үйіңнің қайда екенін сұрады.",o:["Айтамын","Айтпаймын, ересекке айтамын","Суретін жіберемін"],a:1},
+ {q:"Жалған суретті қалай тануға болады?",o:["Саусақ саны қате, жазулар түсініксіз","Сурет әдемі","Суретте күн бар"],a:0},
+ {q:"Интернетте қорқып қалсаң кімге айтасың?",o:["Ешкімге","Ата-анама не мұғаліміме","Бейтаныс адамға"],a:1},
+ {q:"Балаларға арналған сенім телефоны?",o:["150","103","101"],a:0},
+ {q:"Біреудің суретін мазақтап тарату дұрыс па?",o:["Иә, күлкілі","Жоқ, бұл біреуді ренжітеді","Білмеймін"],a:1}
+];
+const KID_RIGHTS=[["📸","Менің суретім – менікі.","Ешкім оны сұрамай жариялай алмайды."],["🙅","Мен «Жоқ!» дей аламын.","Ұнамаса, бейтаныс адамға жауап бермеймін."],["🤐","Менің құпиям – менікі.","Мекенжайым, кодым, құпиясөзім – тек өзімде."],["💛","Мені ешкім мазақтай алмайды.","Интернетте де ешкім ренжітпеуі керек."],["🆘","Мен көмек сұрай аламын.","Ата-анам, мұғалімім, 150 сенім телефоны."]];
+const L={fr:()=>kidMode()?FR_K.slice(0,AGES[AGE].n):FR,rp:()=>kidMode()?RP_K:RP,fn:()=>kidMode()?FN_K:FN,tq:()=>kidMode()?TQ_K:TQ};
+const need=n=>Math.ceil(n*0.7);
+
+/* ---------- progress ---------- */
+let prog={};
+try{prog=JSON.parse(localStorage.getItem("dsk-prog")||"{}")}catch(e){prog={}}
+function award(k){prog[k]=1;try{localStorage.setItem("dsk-prog",JSON.stringify(prog))}catch(e){}renderProg()}
+function renderProg(){
+  const n=STEPS.filter(s=>prog[s.k]).length;
+  document.getElementById("progTxt").textContent=n+" / 5";
+  document.getElementById("progBar").style.width=(n*20)+"%";
+  const bp=document.getElementById("barProg");if(bp)bp.textContent="🛡 "+n+"/5";
+  document.getElementById("badges").innerHTML=STEPS.map(s=>`<span class="badge ${prog[s.k]?"got":""}" style="--c:${s.c}">${s.t}</span>`).join("");
+  document.getElementById("homeSteps").innerHTML=STEPS.map((s,i)=>`<a class="step ${prog[s.k]?"done":""}" style="--c:${s.c};text-decoration:none" href="#steps"><span class="n">${ICONS[s.k]}</span><span><b>${s.t}</b><span class="small muted">${s.s}</span></span><span class="st">${prog[s.k]?"✓":""}</span></a>`).join("");
+}
+
+/* ---------- steps ---------- */
+function renderSteps(){document.getElementById("stepDetails").innerHTML=STEPS.map((s,i)=>`
+ <div class="panel" style="--c:${s.c}">
+  <div class="row" style="align-items:center;gap:12px"><span style="font-family:var(--display);font-size:28px;color:${s.c}">${i+1}</span><div><h3 style="color:${s.c};letter-spacing:1px">${s.t}</h3><span class="muted small">${s.s}</span></div></div>
+  <div class="detail"><ul>${(kidMode()?STEPS_K[s.k]:s.d).map(x=>`<li>${x}</li>`).join("")}</ul></div>
+  <a class="btn ghost" style="text-decoration:none;text-align:center" href="#${s.game}">Тапсырманы орында →</a>
+ </div>`).join("");}
+renderSteps();
+
+/* ---------- generic quiz runner ---------- */
+function runner(box,countEl,src,opts){
+  let i=0,score=0,items=[];
+  function show(){
+    if(i>=items.length){opts.finish(score);return}
+    const it=items[i];
+    countEl.textContent=(i+1)+" / "+items.length;
+    box.innerHTML=`<div class="card">${opts.head(it)}<div class="opts">${it.o.map((o,j)=>`<button class="opt" data-j="${j}">${o}</button>`).join("")}</div><div id="ex"></div></div>`;
+    box.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+      const j=+b.dataset.j;
+      box.querySelectorAll(".opt").forEach(x=>{x.disabled=true;if(+x.dataset.j===it.a)x.classList.add("ok")});
+      if(j===it.a)score++;else b.classList.add("bad");
+      box.querySelector("#ex").innerHTML=`${it.e?`<div class="explain"><b>${j===it.a?"Дұрыс!":"Қате."}</b> ${it.e}</div>`:""}<button class="btn" id="nx" style="margin-top:10px;width:100%">${i+1<items.length?"Келесі":"Нәтиже"}</button>`;
+      box.querySelector("#nx").onclick=()=>{i++;show();window.scrollTo(0,0)};
+    });
+  }
+  return {start(){i=0;score=0;items=typeof src==="function"?src():src;show()},get total(){return items.length}};
+}
+function resultCard(score,total,msg,again){
+  return `<div class="cert"><span class="eyebrow">Нәтиже</span><span class="score">${score} / ${total}</span><p>${msg}</p></div><div class="row" style="margin-top:12px"><button class="btn" onclick="${again}">Қайта ойнау</button><a class="btn ghost" href="#games" style="text-decoration:none">Басқа ойын</a></div>`;
+}
+
+const fr=runner(document.getElementById("frBox"),document.getElementById("frCount"),L.fr,{
+  head:it=>`<div class="msg"><div class="from">${it.from}</div>${it.m}</div><b>Не істейсің?</b>`,
+  finish:s=>{const T=fr.total,k=need(T);if(s>=k){award("stop")}document.getElementById("frBox").innerHTML=resultCard(s,T,s>=k?"Жарайсың! «ТОҚТА» қалқаны жанды.":k+" және одан көп жинасаң, «ТОҚТА» қалқаны жанады. Тағы байқап көр!","fr.start()")}
+});
+const rp=runner(document.getElementById("rpBox"),document.getElementById("rpCount"),L.rp,{
+  head:it=>`<div class="msg">${it.m}</div><b>Дұрыс әрекет қайсы?</b>`,
+  finish:s=>{const T=rp.total,k=need(T);if(s>=k){award("report")}document.getElementById("rpBox").innerHTML=resultCard(s,T,s>=k?"Тамаша! «ХАБАРЛА» қалқаны жанды. Есіңде болсын: 150.":k+" және одан көп жинасаң, «ХАБАРЛА» қалқаны жанады.","rp.start()")}
+});
+
+const fn=runner(document.getElementById("fnBox"),document.getElementById("fnCount"),L.fn,{
+  head:it=>`<div class="msg">${it.m}</div><b>Не істейсің?</b>`,
+  finish:s=>{const T=fn.total,k=need(T);if(s>=k)award("protect");document.getElementById("fnBox").innerHTML=resultCard(s,T,s>=k?"Керемет! Сен алаяқтардың тұзағына түспейсің. «ҚОРҒА» қалқаны жанды.":k+" және одан көп жинасаң, «ҚОРҒА» қалқаны жанады. Ережелерді оқып, қайта ойна.","fn.start()")}
+});
+/* ---------- spot game ---------- */
+let spotFound=new Set();
+function spotReset(){spotFound=new Set();document.getElementById("rings").innerHTML="";document.getElementById("spotList").innerHTML="";document.getElementById("spotCount").textContent="0 / 5";document.getElementById("spotDone").innerHTML=""}
+document.querySelectorAll("#spotSvg .hit").forEach(h=>h.addEventListener("click",()=>{
+  const k=+h.dataset.k;if(spotFound.has(k))return;spotFound.add(k);
+  const s=SPOT[k];
+  document.getElementById("rings").insertAdjacentHTML("beforeend",`<circle class="ring" cx="${s.cx}" cy="${s.cy}" r="${s.r}"/>`);
+  document.getElementById("spotList").insertAdjacentHTML("beforeend",`<li>${s.t}</li>`);
+  document.getElementById("spotCount").textContent=spotFound.size+" / 5";
+  if(spotFound.size===5){award("compare");document.getElementById("spotDone").innerHTML=`<div class="cert"><span class="eyebrow">Барлығын таптың!</span><p>«САЛЫСТЫР» қалқаны жанды. Шын фотода саусақ, көлеңке, жазу, әшекей әрқашан қисынды болады.</p></div><button class="btn ghost" style="margin-top:10px" onclick="spotReset()">Қайта ойнау</button>`}
+}));
+
+/* ---------- scanner ---------- */
+const SIGNS=[
+ "Бет шеті (шаш, иек, құлақ маңы) бұлыңғыр не «жүзіп» тұр ма?",
+ "Тері тым тегіс, пластик сияқты ма?",
+ "Екі көз, екі құлақ, сырға не көзілдірік бір-біріне сәйкес келмей ме?",
+ "Тістер біртұтас ақ жолақ сияқты ма, саны түсініксіз бе?",
+ "Қол-саусақ саны не пішіні қате ме?",
+ "Беттегі жарық пен көлеңке фондағы жарыққа сәйкес келмей ме?",
+ "Фондағы жазулар мағынасыз әріптерден тұра ма?",
+ "Фотоның авторы белгісіз, басқа сенімді жерде табылмай ма?"
+];
+let scanAns=[],metaScore=0;
+function readAscii(dv,off,len){let s="";for(let i=0;i<len&&off+i<dv.byteLength;i++){const c=dv.getUint8(off+i);if(c===0)break;s+=String.fromCharCode(c)}return s.trim()}
+function parseExif(buf){
+  const dv=new DataView(buf),out={};
+  if(dv.byteLength<4||dv.getUint16(0)!==0xFFD8)return out;
+  let p=2;
+  while(p+4<dv.byteLength){
+    const mk=dv.getUint16(p),len=dv.getUint16(p+2);
+    if(mk===0xFFE1&&readAscii(dv,p+4,4)==="Exif"){
+      const t=p+10,le=dv.getUint16(t)===0x4949;
+      const g16=o=>dv.getUint16(o,le),g32=o=>dv.getUint32(o,le);
+      const ifd=t+g32(t+4),n=g16(ifd);
+      const tags={0x010F:"make",0x0110:"model",0x0131:"software",0x0132:"date"};
+      for(let i=0;i<n;i++){const e=ifd+2+i*12;const tag=g16(e);if(tags[tag]){const cnt=g32(e+4);const off=cnt>4?t+g32(e+8):e+8;out[tags[tag]]=readAscii(dv,off,Math.min(cnt,64))}}
+      out.exif=true;break;
+    }
+    if((mk&0xFF00)!==0xFF00)break;p+=2+len;
+  }
+  return out;
+}
+function findAiHints(buf){
+  const bytes=new Uint8Array(buf.slice(0,Math.min(buf.byteLength,400000)));
+  let s="";for(let i=0;i<bytes.length;i++){const c=bytes[i];s+=(c>31&&c<127)?String.fromCharCode(c):" "}
+  const low=s.toLowerCase();
+  const words=["midjourney","dall-e","dall·e","stable diffusion","firefly","openai","chatgpt","gemini","imagen","leonardo","kling","flux","c2pa","trainedalgorithmicmedia","parameters"];
+  return words.filter(w=>low.includes(w));
+}
+function fmtSize(b){return b>1048576?(b/1048576).toFixed(2)+" МБ":(b/1024).toFixed(0)+" КБ"}
+function startScan(src,info){
+  document.getElementById("scanStart").style.display="none";
+  const w=document.getElementById("scanWork");w.style.display="flex";
+  scanAns=new Array(SIGNS.length).fill(null);
+  w.innerHTML=`<div class="scanimg"><img id="scanImg" alt="Тексерілетін фото" src="${src}"><span class="corner"></span><span class="beam" id="beam"></span></div>
+   <div class="panel"><span class="eyebrow">1. Файл деректері</span><dl class="facts" id="facts"><dt>Талдау…</dt><dd></dd></dl><p class="small muted" id="metaNote"></p></div>
+   <div class="panel"><span class="eyebrow">2. Бетті өзің тексер</span><p class="small muted">Фотоны үлкейтіп қарап, әр сұраққа жауап бер.</p><div id="qs"></div></div>
+   <div class="panel" id="res"><span class="eyebrow">3. Күмән деңгейі</span><div class="meter"><i id="needle" style="left:0%"></i></div><div class="row small muted" style="justify-content:space-between"><span>Төмен</span><span>Орташа</span><span>Жоғары</span></div><p class="verdict" id="verdict">Барлық сұраққа жауап бер</p><p id="advice" class="small"></p></div>
+   <div class="panel" id="aiPanel"><span class="eyebrow">ЖИ-талдау (интернет арқылы)</span>
+     <p class="small muted">Жасанды интеллект фотоны қарап, дипфэйк ықтималдығын пайызбен бағалайды және қандай белгілерді көргенін айтады.</p>
+     <button class="btn" id="aiGo">ЖИ-мен тексеру</button>
+     <div id="aiOut" style="display:none;flex-direction:column;gap:10px"></div>
+   </div>
+   <div class="panel"><span class="eyebrow">Онлайн детекторлармен салыстыр</span>
+     <p class="small muted">Сайт бөлек ашылады. Фотоны сол жерге жүктеп, пайызды көр. Бірнеше детектордың нәтижесін салыстыр: бұл да САЛЫСТЫР қадамы.</p>
+     <div class="opts">
+       <a class="opt" style="text-decoration:none" href="https://www.sightengine.com/detect-ai-generated-images" target="_blank" rel="noopener"><b>Sightengine</b><br><span class="small muted">ЖИ суреті және бет алмастыру пайызы</span></a>
+       <a class="opt" style="text-decoration:none" href="https://hivemoderation.com/ai-generated-content-detection" target="_blank" rel="noopener"><b>Hive AI Detector</b><br><span class="small muted">Тіркеусіз, ЖИ ықтималдығы</span></a>
+       <a class="opt" style="text-decoration:none" href="https://app.illuminarty.ai/" target="_blank" rel="noopener"><b>Illuminarty</b><br><span class="small muted">Суреттің күмәнді аймағын көрсетеді</span></a>
+     </div>
+   </div>
+   <p class="small muted">Есіңде болсын: ешбір сканер, ЖИ немесе детектор 100% дәл айта алмайды. Пайыз – тек болжам. Соңғы шешімді 5 қадаммен өзің қабылдайсың.</p>
+   <button class="btn ghost" onclick="resetScan()">Басқа фото тексеру</button>`;
+  document.getElementById("qs").innerHTML=SIGNS.map((q,i)=>`<div class="q"><span>${i+1}. ${q}</span><div class="seg" data-i="${i}"><button data-v="2">Иә</button><button data-v="0">Жоқ</button><button data-v="1">Білмеймін</button></div></div>`).join("");
+  document.querySelectorAll("#qs .seg").forEach(sg=>sg.querySelectorAll("button").forEach(b=>b.onclick=()=>{sg.querySelectorAll("button").forEach(x=>x.classList.remove("sel"));b.classList.add("sel");scanAns[+sg.dataset.i]=+b.dataset.v;calc()}));
+  const img=document.getElementById("scanImg");
+  img.onload=()=>{
+    setTimeout(()=>{const bm=document.getElementById("beam");if(bm)bm.remove()},2200);
+    const f=[["Өлшемі",img.naturalWidth+" × "+img.naturalHeight+" px"]];
+    if(info.size)f.push(["Көлемі",fmtSize(info.size)]);
+    if(info.type)f.push(["Түрі",info.type]);
+    metaScore=0;const notes=[];
+    if(info.exif&&(info.exif.make||info.exif.model)){f.push(["Камера",[info.exif.make,info.exif.model].filter(Boolean).join(" ")]);notes.push("Файлда камера туралы дерек бар: бұл шын фото болуы ықтимал, бірақ деректі өзгертуге болады.");metaScore-=2}
+    else{f.push(["Камера","Дерек жоқ"]);notes.push("Камера деректері жоқ. Скриншот, мессенджер арқылы келген не ЖИ жасаған сурет болуы мүмкін.");metaScore+=1}
+    if(info.exif&&info.exif.software)f.push(["Бағдарлама",info.exif.software]);
+    if(info.exif&&info.exif.date)f.push(["Түсірілген күні",info.exif.date]);
+    if(info.hints&&info.hints.length){f.push(["ЖИ белгісі","Табылды: "+info.hints.join(", ")]);notes.unshift("Файлдың ішінде ЖИ құралының не контент таңбасының (C2PA) іздері табылды!");metaScore+=6}
+    else f.push(["ЖИ белгісі","Файлда табылмады"]);
+    if(img.naturalWidth===img.naturalHeight&&[512,768,1024,2048].includes(img.naturalWidth)){notes.push("Шаршы пішін (мысалы 1024×1024) ЖИ суреттерінде жиі кездеседі.");metaScore+=1}
+    document.getElementById("facts").innerHTML=f.map(([a,b])=>`<dt>${a}</dt><dd>${b}</dd>`).join("");
+    document.getElementById("metaNote").textContent=notes.join(" ");
+    calc();
+  };
+  award("check");
+  setupAI(img);
+}
+let sampleFn=null,samplePromise=null;
+function getSample(){if(!samplePromise){samplePromise=(window.claude&&claude.use)?claude.use("sample").catch(()=>null):Promise.resolve(null)}return samplePromise}
+function imgToBlob(img){return new Promise((res,rej)=>{try{const m=1024,k=Math.min(1,m/Math.max(img.naturalWidth||m,img.naturalHeight||m));const c=document.createElement("canvas");c.width=Math.round((img.naturalWidth||m)*k);c.height=Math.round((img.naturalHeight||m)*k);const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(img,0,0,c.width,c.height);c.toBlob(b=>b?res(b):rej(new Error("blob")),"image/jpeg",0.9)}catch(e){rej(e)}})}
+async function setupAI(img){
+  const btn=document.getElementById("aiGo"),out=document.getElementById("aiOut");
+  btn.disabled=true;btn.textContent="Қосылуда…";
+  const s=await getSample();
+  let ok=!!s;
+  if(ok){try{const l=await s.limits();ok=!!(l&&l.images)}catch(e){ok=true}}
+  if(!ok){document.getElementById("aiPanel").style.display="none";return}
+  sampleFn=s;btn.disabled=false;btn.textContent="ЖИ-мен тексеру";
+  btn.onclick=()=>runAI(img);
+}
+async function runAI(img){
+  const btn=document.getElementById("aiGo"),out=document.getElementById("aiOut");
+  btn.disabled=true;btn.textContent="ЖИ талдап жатыр…";out.style.display="flex";
+  out.innerHTML=`<div class="scanimg" style="height:6px;border:0"><span class="beam"></span></div><p class="small muted">Бұл 10–30 секунд алуы мүмкін.</p>`;
+  try{
+    const blob=await imgToBlob(img);
+    const prompt=`Сен мектеп оқушыларына арналған «DEEP SHIELD KZ» цифрлық қауіпсіздік платформасындағы сарапшысың. Тіркелген суретті мұқият қара да, оның ЖИ арқылы жасалған немесе дипфэйк (бет алмастырылған, өңделген) болу ықтималдығын бағала.
+Тексер: бет шеттері, тері текстурасы, көз, құлақ, әшекей симметриясы, тістер, қол-саусақ, жарық пен көлеңке, фондағы жазу, жалпы «тым мінсіз» көрініс. Егер суретте бет жоқ болса, жалпы ЖИ белгілерін бағала.
+Адал бол: сенің бағаң – болжам, 100% сенімділік берме (0–100 аралығында, бірақ 3-тен төмен не 97-ден жоғары емес). Белгілер анық болмаса, 40–60 маңында бер.
+Жауапты ТЕК JSON түрінде, қазақ тілінде, 10–14 жастағы оқушыға түсінікті етіп бер:
+{"percent": сан, "verdict": "қысқа қорытынды (5-8 сөз)", "signs": ["көрген нақты белгі", "..."] (2-5 элемент), "real_signs": ["шынайылықты көрсететін белгі"] (0-3 элемент), "advice": "оқушыға 1-2 сөйлемдік кеңес"}`;
+    let v;
+    const opts={images:[blob],modelTier:"default"};
+    if(typeof sampleFn.json==="function"){v=await sampleFn.json(prompt,opts)}
+    else{const r=await sampleFn(prompt,opts);const m=r.text.match(/\{[\s\S]*\}/);v=JSON.parse(m?m[0]:r.text)}
+    if(typeof v==="string"){const m=v.match(/\{[\s\S]*\}/);v=JSON.parse(m?m[0]:v)}
+    const pct=Math.max(0,Math.min(100,Math.round(+v.percent||0)));
+    const col=pct<35?"var(--protect)":pct<65?"var(--check)":"var(--stop)";
+    const esc=t=>String(t||"").replace(/[<>&]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;"}[c]));
+    out.innerHTML=`<div class="cert" style="border-color:${col}"><span class="eyebrow">ЖИ бағасы: дипфэйк ықтималдығы</span><span class="score" style="color:${col}">${pct}%</span><div class="meter"><i style="left:${pct}%"></i></div><p class="verdict">${esc(v.verdict)}</p></div>
+      ${(v.signs||[]).length?`<div><b>Күмәнді белгілер:</b><ul style="margin:6px 0 0;padding-left:18px">${v.signs.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""}
+      ${(v.real_signs||[]).length?`<div><b>Шынайылық белгілері:</b><ul style="margin:6px 0 0;padding-left:18px">${v.real_signs.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""}
+      ${v.advice?`<div class="explain">${esc(v.advice)}</div>`:""}
+      <p class="small muted">Бұл – ЖИ-дің болжамы. Өз чек-листіңмен (2-бөлім) және онлайн детекторлармен салыстыр.</p>`;
+    btn.textContent="Қайта тексеру";
+  }catch(e){
+    const code=e&&e.code;
+    out.innerHTML=`<p class="small">${code==="rate_limited"?"Сұраулар тым көп болды. Бір минуттан кейін қайта байқап көр.":code==="not_granted"?"ЖИ-талдауға рұқсат берілмеді. Онлайн детекторларды қолдан.":"ЖИ-талдау орындалмады. Интернетті тексеріп, қайта байқап көр немесе онлайн детекторларды қолдан."}</p>`;
+    if(code==="not_granted")btn.style.display="none";else btn.textContent="Қайта тексеру";
+  }
+  btn.disabled=false;
+}
+function calc(){
+  const answered=scanAns.filter(v=>v!==null).length;
+  if(answered<SIGNS.length){document.getElementById("verdict").textContent=`Жауап берілді: ${answered} / ${SIGNS.length}`;return}
+  const raw=scanAns.reduce((a,b)=>a+b,0)+metaScore;
+  const pct=Math.max(0,Math.min(100,raw/22*100));
+  document.getElementById("needle").style.left=pct+"%";
+  let v,a;
+  if(pct<30){v="Күмән төмен";a="Белгілер аз. Бірақ дереккөзді бәрібір тексеріп, басқа жерден салыстыр."}
+  else if(pct<60){v="Күмән орташа";a="Бірнеше белгі бар. Таратпа. Фотоны Google Lens арқылы іздеп, алғашқы нұсқасын тап."}
+  else{v="Күмән жоғары";a="Көп белгі бар: бұл дипфэйк не ЖИ суреті болуы мүмкін. Таратпа. Егер бұл сенің не досыңның бейнесі болса, ересекке хабарла."}
+  document.getElementById("verdict").textContent=v;document.getElementById("advice").textContent=a;
+}
+function resetScan(){document.getElementById("scanWork").style.display="none";document.getElementById("scanStart").style.display="flex";document.getElementById("scanFile").value=""}
+document.getElementById("scanFile").addEventListener("change",e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{const buf=r.result;const info={size:f.size,type:f.type,exif:parseExif(buf),hints:findAiHints(buf)};startScan(URL.createObjectURL(f),info)};
+  r.readAsArrayBuffer(f);
+});
+document.getElementById("scanDemo").onclick=()=>{
+  const svg=document.getElementById("spotSvg").outerHTML.replace(/<g id="rings">.*?<\/g>/,'<g></g>').replace(/<(circle|rect|ellipse) class="hit"[^>]*>/g,'');
+  const src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svg.replace('<svg ','<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" '));
+  startScan(src,{type:"Үлгі сурет",exif:{},hints:[]});
+};
+
+/* ---------- test ---------- */
+const tBox=document.getElementById("tBox");
+function testIntro(){
+  const n=L.tq().length;document.getElementById("tCount").textContent=n+" сұрақ";
+  tBox.innerHTML=`<div class="panel"><label for="tName"><b>Атың-жөнің</b></label><input id="tName" type="text" placeholder="Мысалы: Айару Серікқызы"><p class="small muted">Сертификатқа жазылады. ${need(n)} және одан көп жинасаң, «ҚОРҒА» қалқаны жанады.</p><button class="btn" id="tGo">Тестті бастау</button></div>`;
+  document.getElementById("tGo").onclick=()=>{testName=document.getElementById("tName").value.trim();tr.start()};
+}
+let testName="";
+const tr=runner(tBox,document.getElementById("tCount"),L.tq,{
+  head:it=>`<b style="font-size:17px">${it.q}</b>`,
+  finish:s=>{
+    const T=tr.total,ok=s>=need(T);if(ok)award("protect");
+    const d=new Date().toLocaleDateString("kk-KZ");
+    tBox.innerHTML=`<div class="cert"><span class="eyebrow">DEEP SHIELD KZ · Сертификат</span>${testName?`<h3>${testName.replace(/[<>&]/g,"")}</h3>`:""}<span class="score">${s} / ${T}</span><p>${ok?"«Цифрлық қорғаушы» атағы берілді!":s>=Math.ceil(T/2)?"Жақсы нәтиже! Тағы аздап дайындалып, қайта тапсыр.":"Ойын-сабақтарды ойнап, қайта тапсыр."}</p><span class="small muted">${d}</span></div><p class="small muted" style="margin-top:8px">Мұғалімге көрсету үшін скриншот жаса.</p><div class="row" style="margin-top:10px"><button class="btn" onclick="testIntro()">Қайта тапсыру</button></div>`;
+  }
+});
+testIntro();
+
+/* ---------- rights ---------- */
+let opened=new Set();
+document.getElementById("laws").innerHTML=LAWS.map((l,i)=>`<details class="law" data-i="${i}"><summary><span>${l.tag}</span>${l.t}</summary><div class="body">${l.b}</div></details>`).join("");
+document.querySelectorAll(".law").forEach(d=>d.addEventListener("toggle",()=>{if(d.open){opened.add(d.dataset.i);if(opened.size>=LAWS.length&&!prog.protect){/* reading all counts toward ҚОРҒА too */award("protect")}}}));
+
+/* ---------- QR ---------- */
+try{if(window.top===window&&/^https?:/.test(location.protocol)){document.getElementById("qrLink").value=location.href.split("#")[0]}}catch(e){}
+document.getElementById("qrMake").onclick=()=>{
+  const v=document.getElementById("qrLink").value.trim();const out=document.getElementById("qrout");
+  if(!v){document.getElementById("qrLink").focus();return}
+  out.style.display="block";out.innerHTML="";
+  if(typeof QRCode==="undefined"){out.textContent="QR кітапханасы жүктелмеді. Интернетті тексер.";return}
+  new QRCode(out,{text:v,width:520,height:520,correctLevel:QRCode.CorrectLevel.M});
+};
+
+
+/* ---------- face id lab ---------- */
+const F={phase:"enroll",enrolled:null,frame:null,img:null,tries:[]};
+const MESH=(()=>{const p=[];
+  for(let i=0;i<=16;i++){const a=Math.PI*(0.05+0.9*i/16);p.push([0.5-0.46*Math.cos(a),0.42+0.52*Math.sin(a)])}
+  for(let i=0;i<5;i++){p.push([0.18+i*0.06,0.36-Math.sin(i/4*Math.PI)*0.04]);p.push([0.58+i*0.06,0.36-Math.sin(i/4*Math.PI)*0.04])}
+  for(let i=0;i<4;i++)p.push([0.5,0.42+i*0.06]);
+  for(let i=0;i<5;i++)p.push([0.42+i*0.04,0.66-(i===2?0.02:0)]);
+  [[0.33,0.45],[0.67,0.45]].forEach(([cx,cy])=>{for(let i=0;i<6;i++){const a=i/6*Math.PI*2;p.push([cx+0.07*Math.cos(a),cy+0.03*Math.sin(a)])}});
+  for(let i=0;i<12;i++){const a=i/12*Math.PI*2;p.push([0.5+0.13*Math.cos(a),0.79+0.045*Math.sin(a)])}
+  return p})();
+const fImg=document.getElementById("fImg"),fSvg=document.getElementById("fSvg");
+function fSetSteps(){["fs1","fs2","fs3"].forEach((id,i)=>{const el=document.getElementById(id);el.classList.remove("on","ok");const n=F.phase==="enroll"?0:F.phase==="unlock"?1:2;if(i<n)el.classList.add("ok");else if(i===n)el.classList.add("on")})}
+function fDrawFrame(){
+  const W=fImg.naturalWidth,H=fImg.naturalHeight;if(!W)return;
+  fSvg.setAttribute("viewBox",`0 0 ${W} ${H}`);fSvg.setAttribute("preserveAspectRatio","none");
+  const fr=F.frame,sw=Math.max(2,W/180);
+  const c=sw*8;
+  const corners=[[fr.x,fr.y,1,1],[fr.x+fr.w,fr.y,-1,1],[fr.x,fr.y+fr.h,1,-1],[fr.x+fr.w,fr.y+fr.h,-1,-1]].map(([x,y,dx,dy])=>`<path d="M${x} ${y+dy*c*3}V${y}H${x+dx*c*3}" stroke="#2ee6d6" stroke-width="${sw*2}" fill="none"/>`).join("");
+  fSvg.innerHTML=`<rect width="${W}" height="${H}" fill="rgba(7,13,28,.45)" mask="url(#fm)"/><defs><mask id="fm"><rect width="${W}" height="${H}" fill="#fff"/><ellipse cx="${fr.x+fr.w/2}" cy="${fr.y+fr.h/2}" rx="${fr.w/2}" ry="${fr.h/2}" fill="#000"/></mask></defs><ellipse cx="${fr.x+fr.w/2}" cy="${fr.y+fr.h/2}" rx="${fr.w/2}" ry="${fr.h/2}" fill="none" stroke="rgba(46,230,214,.6)" stroke-width="${sw}" stroke-dasharray="${sw*4} ${sw*3}"/>${corners}<g id="fMesh"></g>`;
+}
+function fPlaceFrame(cx,cy){
+  const W=fImg.naturalWidth,H=fImg.naturalHeight,k=+document.getElementById("fSize").value/100;
+  const w=Math.min(W,H)*k,h=w*1.25;
+  F.frame={x:Math.max(0,Math.min(W-w,cx-w/2)),y:Math.max(0,Math.min(H-h,cy-h/2)),w,h:Math.min(h,H)};
+  fDrawFrame();
+}
+async function fAutoFrame(){
+  const W=fImg.naturalWidth,H=fImg.naturalHeight;
+  let cx=W/2,cy=H*0.45;
+  try{if("FaceDetector" in window){const fd=new FaceDetector({fastMode:true,maxDetectedFaces:1});const r=await fd.detect(fImg);if(r&&r[0]){const b=r[0].boundingBox;cx=b.x+b.width/2;cy=b.y+b.height/2;const k=Math.round(Math.min(95,Math.max(20,b.width*1.35/Math.min(W,H)*100)));document.getElementById("fSize").value=k;document.getElementById("fHint").textContent="Бет автоматты табылды. Қажет болса, жақтауды жылжыт."}}}catch(e){}
+  fPlaceFrame(cx,cy);
+}
+fSvg.addEventListener("click",e=>{
+  if(!F.frame||document.getElementById("fScan").disabled)return;
+  const r=fSvg.getBoundingClientRect();
+  fPlaceFrame((e.clientX-r.left)/r.width*fImg.naturalWidth,(e.clientY-r.top)/r.height*fImg.naturalHeight);
+});
+document.getElementById("fSize").addEventListener("input",()=>{if(F.frame)fPlaceFrame(F.frame.x+F.frame.w/2,F.frame.y+F.frame.h/2)});
+document.getElementById("fCam").addEventListener("change",e=>{
+  const f=e.target.files[0];if(!f)return;
+  if(fImg.src&&fImg.src.startsWith("blob:"))URL.revokeObjectURL(fImg.src);
+  fImg.onload=()=>{document.getElementById("fStageWrap").style.display="flex";document.getElementById("fResult").style.display="none";document.getElementById("fScan").disabled=false;fAutoFrame()};
+  fImg.src=URL.createObjectURL(f);e.target.value="";
+});
+function fCode(){
+  const N=32,c=document.createElement("canvas");c.width=N;c.height=N;const x=c.getContext("2d",{willReadFrequently:true});
+  const fr=F.frame;x.filter="blur(1px)";x.drawImage(fImg,fr.x,fr.y,fr.w,fr.h,0,0,N,N);
+  const d=x.getImageData(0,0,N,N).data,v=[];
+  for(let i=0;i<N*N;i++){const g=0.299*d[i*4]+0.587*d[i*4+1]+0.114*d[i*4+2];
+    const px=i%N,py=Math.floor(i/N),ex=(px-N/2+.5)/(N/2),ey=(py-N/2+.5)/(N/2);v.push(ex*ex+ey*ey<=1?g:null)}
+  const vals=v.filter(t=>t!==null),m=vals.reduce((a,b)=>a+b,0)/vals.length,sd=Math.sqrt(vals.reduce((a,b)=>a+(b-m)*(b-m),0)/vals.length)||1;
+  const z=v.map(t=>t===null?0:(t-m)/sd);
+  const grid=[];for(let gy=0;gy<16;gy++)for(let gx=0;gx<16;gx++){let s2=0;for(let a=0;a<2;a++)for(let b=0;b<2;b++)s2+=z[(gy*2+a)*N+gx*2+b];grid.push(s2/4)}
+  return {z,grid,mean:m};
+}
+function fCompare(a,b){let s=0,na=0,nb=0;for(let i=0;i<a.length;i++){s+=a[i]*b[i];na+=a[i]*a[i];nb+=b[i]*b[i]}const r=s/Math.sqrt(na*nb||1);return Math.round(Math.max(0,Math.min(1,(r-0.35)/0.6))*100)}
+function fGridHTML(g){return `<div class="codegrid">${g.map(t=>{const l=Math.max(8,Math.min(92,50+t*22));return `<i style="background:hsl(174 70% ${l}%)"></i>`}).join("")}</div>`}
+function fHex(g){let h="";for(let i=0;i<g.length;i+=4){let n=0;for(let j=0;j<4;j++)n=n*2+(g[i+j]>0?1:0);h+=n.toString(16)}return h.toUpperCase().match(/.{1,8}/g).slice(0,4).join(" ")}
+function fAnimate(){return new Promise(res=>{
+  const g=document.getElementById("fMesh"),fr=F.frame,W=fImg.naturalWidth,r=Math.max(2,W/220);
+  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let html="";MESH.forEach(([u,v],i)=>{html+=`<circle cx="${fr.x+u*fr.w}" cy="${fr.y+v*fr.h}" r="${r}" fill="#2ee6d6" opacity="0"><animate attributeName="opacity" from="0" to="1" begin="${reduce?0:(i*0.025).toFixed(3)}s" dur="0.15s" fill="freeze"/></circle>`});
+  const lines=[];for(let i=0;i<16;i++)lines.push([i,i+1]);
+  html=`<g stroke="rgba(46,230,214,.45)" stroke-width="${r/2}">${lines.map(([a,b])=>`<line x1="${fr.x+MESH[a][0]*fr.w}" y1="${fr.y+MESH[a][1]*fr.h}" x2="${fr.x+MESH[b][0]*fr.w}" y2="${fr.y+MESH[b][1]*fr.h}"/>`).join("")}</g>`+html;
+  if(!reduce)html+=`<rect x="${fr.x}" width="${fr.w}" height="${r*1.5}" fill="#2ee6d6"><animate attributeName="y" from="${fr.y}" to="${fr.y+fr.h}" dur="0.9s" repeatCount="2"/></rect>`;
+  g.innerHTML=html;setTimeout(res,reduce?300:1900);
+})}
+document.getElementById("fScan").onclick=async()=>{
+  const btn=document.getElementById("fScan");btn.disabled=true;btn.textContent="Сканерлеп жатыр…";
+  await fAnimate();
+  const code=fCode(),out=document.getElementById("fResult");out.style.display="flex";
+  if(code.mean<35||code.mean>225){out.innerHTML=`<div class="explain">Сурет тым ${code.mean<35?"қараңғы":"жарық"}. Жарығы қалыпты жерде қайта түсір.</div>`;btn.disabled=false;btn.textContent="Сканерлеу";return}
+  if(F.phase==="enroll"){
+    F.enrolled=code;F.phase="unlock";fSetSteps();
+    out.innerHTML=`<div class="lock" style="color:var(--protect)">✓ Бетің тіркелді</div>
+      <div class="row" style="align-items:center;gap:14px">${fGridHTML(code.grid)}<div class="small"><b>Сенің «бет кодың»</b><br><span style="font-variant-numeric:tabular-nums;font-family:monospace">${fHex(code.grid)}</span><br><span class="muted">Телефон фотоңды емес, осындай кодты сақтайды.</span></div></div>
+      <p>Енді <b>2-қадам</b>: тағы бір селфи түсіріп, «телефонды» бетіңмен аш.</p>`;
+    document.getElementById("fCamLbl").textContent="Ашу үшін селфи түсіру";
+  }else{
+    const pct=fCompare(F.enrolled.z,code.z),ok=pct>=80;
+    F.tries.unshift(pct);if(F.phase==="unlock")F.phase="trick";fSetSteps();
+    out.innerHTML=`<div class="cert" style="border-color:${ok?"var(--protect)":"var(--stop)"}"><span class="eyebrow">Сәйкестік</span><span class="score" style="color:${ok?"var(--protect)":"var(--stop)"}">${pct}%</span><div class="lock" style="justify-content:center;color:${ok?"var(--protect)":"var(--stop)"}">${ok?"🔓 Ашылды":"🔒 Ашылмады"}</div><p class="small muted">Шек: 80%. Кодтар: ${fHex(F.enrolled.grid).slice(0,8)} ↔ ${fHex(code.grid).slice(0,8)}</p></div>
+      ${F.tries.length>1?`<p class="small muted">Алдыңғы әрекеттер: ${F.tries.slice(1,6).map(t=>t+"%").join(", ")}</p>`:""}
+      <div class="panel" style="background:var(--panel2)"><span class="eyebrow">3. Алдап көр</span><ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+        <li>Досыңның бетімен аш. Ашылмаса, бұл дұрыс!</li>
+        <li>Өз фотоңды басқа телефонның экранынан түсір. Біздің 2D сканер ашылып кетуі мүмкін, ал шын Face ID 3D тереңдік пен тірілікті тексеретіндіктен ашылмайды.</li>
+        <li>Көзілдірік ки, басыңды бұр, жарықты өзгерт. Пайыз қалай өзгереді?</li>
+        <li>Ойлан: егер біреу сенің бетіңнен дипфэйк жасаса, неге тек бетке сенуге болмайды?</li>
+      </ul></div>`;
+  }
+  btn.textContent="Сканерлеу";
+  document.getElementById("fStageWrap").style.display="none";
+  const rs=document.createElement("button");rs.className="btn ghost";rs.textContent="Бәрін өшіріп, басынан бастау";rs.onclick=fReset;out.appendChild(rs);
+};
+function fReset(){F.phase="enroll";F.enrolled=null;F.tries=[];F.frame=null;if(fImg.src&&fImg.src.startsWith("blob:"))URL.revokeObjectURL(fImg.src);fImg.removeAttribute("src");fSvg.innerHTML="";document.getElementById("fStageWrap").style.display="none";document.getElementById("fResult").style.display="none";document.getElementById("fCamLbl").textContent="Камераны ашу";fSetSteps()}
+fSetSteps();
+
+
+/* ---------- buddy (Сақбол) ---------- */
+const TIPS={
+ home:["Сәлем! Мен Сақболмын. 5 қадамды үйреніп, қалқаныңды жандыр!","Бір ойын таңда, мен қасыңдамын!","Есіңде болсын: күмәнді нәрсені көрсең – ТОҚТА!"],
+ steps:["Бес қадам: Тоқта, Тексер, Салыстыр, Қорға, Хабарла!","Әр қадамның тапсырмасын орындасаң, қалқаның жанады."],
+ games:["Қай ойыннан бастаймыз?","Ойнап отырып үйренеміз!"],
+ "game-fakereal":["Мұқият оқы: кім жазды? Неге асықтырады?","Шын ба, жалған ба? Ойланып барып бас!"],
+ "game-spot":["Саусақтарды санап көр!","Сырғаларға, жазуға, көлеңкеге қара!","Күн қай жақта? Көлеңке қайда?"],
+ "game-report":["Қиын жағдайда жалғыз қалма. Ересекке айт!","Сенің кінәң жоқ. Көмек сұрау – батылдық!"],
+ "game-finance":["Кодты ешкімге айтпаймыз, тіпті банкке де!","«Тегін сыйлық» деп карта сұраса – алаяқ!"],
+ scan:["Фотоны жүкте, бірге тексерейік!","Бет шеттеріне, саусақтарға қара."],
+ faceid:["Камераны ашып, маған күлімдеп қара! 😊","Бетің – сенің құпиясөзің. Оны бөтенге берме!"],
+ test:["Сен міндетті түрде жақсы тапсырасың!","Асықпа, әр сұрақты мұқият оқы."],
+ rights:["Интернетте де сенің құқығың бар!","Көмек керек болса: 150."],
+ qr:["QR жасап, достарыңмен бөліс!"],install:["Мені телефоныңның экранына қондыр!"]
+};
+const PRAISE=["Жарайсың! 🎉","Керемет! Сен нағыз қорғаушысың!","Дұп-дұрыс! ⭐","Бәрекелді!"];
+const COMFORT=["Ештеңе етпейді, бірге үйренеміз!","Түсіндірмені оқып шық, келесіде табасың!","Қателесу – үйренудің бір бөлігі."];
+let buddyTimer=null,curView="home";
+function buddySay(t,mood){
+  const b=document.getElementById("buddy"),say=document.getElementById("buddySay");if(!b)return;
+  say.textContent=t;say.classList.remove("hide");
+  b.classList.remove("mood-happy","mood-sad","jump");void b.offsetWidth;
+  if(mood)b.classList.add("mood-"+mood);if(mood==="happy")b.classList.add("jump");
+  clearTimeout(buddyTimer);buddyTimer=setTimeout(()=>{say.classList.add("hide");b.classList.remove("mood-happy","mood-sad")},6000);
+}
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+document.getElementById("buddyBtn").onclick=()=>buddySay(pick(TIPS[curView]||TIPS.home));
+document.getElementById("buddySay").onclick=()=>document.getElementById("buddySay").classList.add("hide");
+document.addEventListener("click",e=>{
+  const o=e.target.closest(".opt");
+  if(o&&o.tagName==="BUTTON"){setTimeout(()=>{buddySay(o.classList.contains("ok")?pick(PRAISE):pick(COMFORT),o.classList.contains("ok")?"happy":"sad")},30)}
+  if(e.target.closest("#spotSvg .hit"))setTimeout(()=>buddySay(spotFound.size===5?"Бәрін таптың! Сен – нағыз детективсің! 🕵️":"Таптың! Тағы "+(5-spotFound.size)+" қате қалды.","happy"),30);
+});
+const _award=award;award=function(k){const had=prog[k];_award(k);if(!had)setTimeout(()=>buddySay("Ура! Қалқаныңның тағы бір бөлігі жанды! 🛡️","happy"),400)};
+
+
+/* ---------- age picker ---------- */
+function renderKidRights(){
+  const kr=document.getElementById("kidRights"),lh=document.getElementById("lawsHead");
+  if(kidMode()){kr.style.display="flex";kr.innerHTML=`<span class="eyebrow">Менің 5 құқығым</span>`+KID_RIGHTS.map(([e,t,d])=>`<div class="kr"><span>${e}</span><div><b>${t}</b><br><span class="small muted">${d}</span></div></div>`).join("");lh.textContent="Үлкендерге: заңдар";}
+  else{kr.style.display="none";lh.textContent="Заңдар"}
+}
+function applyAge(){
+  const a=AGES[AGE];document.getElementById("ageBtn").textContent=a?a.e+" "+a.t:"👤";
+  renderSteps();renderKidRights();testIntro();
+}
+function openAge(){
+  const ap=document.getElementById("agePick");ap.style.display="block";
+  document.getElementById("ageBuddy").innerHTML=document.querySelector("#buddyBtn svg").outerHTML;
+  ap.querySelectorAll(".agebtn").forEach(b=>b.classList.toggle("sel",b.dataset.a===AGE));
+}
+document.querySelectorAll(".agebtn").forEach(b=>b.onclick=()=>{
+  AGE=b.dataset.a;try{localStorage.setItem("dsk-age",AGE)}catch(e){}
+  document.getElementById("agePick").style.display="none";applyAge();
+  const h=location.hash.replace("#","");if(h==="game-fakereal")fr.start();if(h==="game-report")rp.start();if(h==="game-finance")fn.start();
+  buddySay(AGE==="small"?"Керемет! Саған арнап қысқа әрі қызық ойындар дайындадым! 🐣":AGE==="mid"?"Тамаша! Кеттік, бірге үйренеміз! 🚀":"Жарайсың! Саған толық деңгей ашылды! 🦅","happy");
+});
+document.getElementById("ageBtn").onclick=openAge;
+applyAge();
+
+/* ---------- router ---------- */
+const VIEWS=["home","steps","games","game-fakereal","game-spot","game-report","game-finance","install","scan","faceid","test","rights","qr"];
+function route(){
+  let h=location.hash.replace("#","");if(!VIEWS.includes(h))h="home";
+  document.querySelectorAll(".view").forEach(v=>v.classList.toggle("on",v.id==="v-"+h));
+  const tab=h.startsWith("game")?"games":h==="faceid"?"scan":h;
+  document.querySelectorAll("nav.tabs a").forEach(a=>a.classList.toggle("on",a.dataset.t===tab));
+  if(h==="game-fakereal")fr.start();
+  if(h==="game-report")rp.start();
+  if(h==="game-spot")spotReset();
+  if(h==="game-finance")fn.start();
+  window.scrollTo(0,0);
+  curView=h;if(typeof buddySay==="function"&&document.getElementById("splash")===null)buddySay(pick(TIPS[h]||TIPS.home));
+}
+document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{location.hash=b.dataset.go});
+window.addEventListener("hashchange",route);
+renderProg();route();
+if("serviceWorker" in navigator&&location.protocol==="https:"){navigator.serviceWorker.register("sw.js").catch(()=>{})}
+setTimeout(()=>{const sp=document.getElementById("splash");if(sp){sp.classList.add("hide");setTimeout(()=>{sp.remove();if(!AGE)openAge();else buddySay(TIPS[curView]?TIPS[curView][0]:TIPS.home[0])},600)}},1400);
+</script>
+</body>
+</html>
